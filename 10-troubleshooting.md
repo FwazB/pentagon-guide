@@ -243,6 +243,44 @@ After a laptop sleep/wake cycle, A2A messaging can fail to reconnect properly.
 
 ---
 
+## Duplicate Message Injection (Message Flood)
+
+**Symptoms:** An agent receives the same message injected into its conversation repeatedly — 10, 15, 20+ times. Each duplicate triggers a new notification. The agent wastes context acknowledging duplicates ("Duplicate #11. Same message. Already handled.") while its actual work stalls.
+
+**What it looks like:**
+```
+● Standing by.
+  New message from deimos. Read: /path/to/inbox/B2C3D4E5.json
+● Duplicate #11. Same message. Already handled.
+  New message from deimos. Read: /path/to/inbox/B2C3D4E5.json
+● Duplicate #12. Standing by for new input.
+  New message from deimos. Read: /path/to/inbox/B2C3D4E5.json
+● Duplicate #13. Acknowledged and ignored.
+  ...
+```
+
+**Cause:** A bug in Pentagon's A2A message injection layer. The message was delivered once to the inbox, but the injection system re-injects it into the agent's conversation repeatedly. This can happen to agents that have been running normally all day — it's not limited to startup or wake scenarios. Known bug as of v1.2.9; Edgar is actively hunting it.
+
+**Impact:**
+- Agent burns through context window acknowledging duplicates instead of doing real work
+- If the agent tries to reply to each duplicate, it may send duplicate responses upstream
+- The agent's report.json and task progress stall during the flood
+
+**Fix:**
+1. Run `/clear` in the agent's terminal to reset the conversation context and stop the injection loop
+2. If `/clear` doesn't stop it, terminate and respawn the agent
+3. The original message is still in the inbox — the agent will process it cleanly on restart
+4. Check if the agent sent duplicate replies during the flood and notify affected agents
+
+**Prevention:**
+- No user-side prevention currently — this is a Pentagon-level bug being fixed
+- If an agent starts logging duplicate acknowledgments, intervene quickly with `/clear` before it burns too much context
+- Agents can add a MEMORY.md note: "If I see the same message injected multiple times, acknowledge once and ignore subsequent duplicates"
+
+**Status:** Known issue, actively being patched. Keep Pentagon updated.
+
+---
+
 ## "Crash Cap Exhausted" Desktop Notification
 
 **Symptoms:** You get a macOS notification saying an agent exhausted its restart attempts. The agent is no longer restarting.
