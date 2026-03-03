@@ -19,3 +19,7 @@
 * [Skills and Tools](07-skills-and-tools.md)
 * [Common Pitfalls](08-common-pitfalls.md)
 * [Operational Playbook](09-operational-playbook.md)
+
+## Reference
+
+* [Troubleshooting](10-troubleshooting.md)

@@ -62,6 +62,7 @@ Each chapter stands alone. Read them in order for the full picture, or jump to w
 | [7. Skills and Tools](07-skills-and-tools.md) | Custom skills, hooks, tool patterns | Extending capabilities |
 | [8. Common Pitfalls](08-common-pitfalls.md) | Failures and how to prevent them | Before scaling up |
 | [9. Operational Playbook](09-operational-playbook.md) | Step-by-step recipes | When you need a how-to |
+| [10. Troubleshooting](10-troubleshooting.md) | Common errors and fixes | When something breaks |
 
 ---
 

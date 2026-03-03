@@ -526,4 +526,4 @@ If tests fail on clean HEAD, the failures are pre-existing — not yours. This b
 
 ---
 
-Back to [README](README.md)
+Next: [Chapter 10 — Troubleshooting](10-troubleshooting.md) — Common errors and how to fix them.
