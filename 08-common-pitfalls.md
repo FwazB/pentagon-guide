@@ -21,7 +21,7 @@ Every decision that affects another agent MUST be sent via
 /send-pentagon-message. report.json is for human visibility only.
 ```
 
-**Detection:** The auditor pattern (Chapter 5) catches this by cross-referencing reports with inbox contents.
+**Detection:** The auditor pattern ([Chapter 5](05-auditor-pattern.md)) catches this by cross-referencing reports with inbox contents.
 
 ---
 
@@ -77,7 +77,7 @@ Every decision that affects another agent MUST be sent via
 - Monitor agent behavior for quality degradation
 - Respawn proactively at the first sign of decline
 - Keep MEMORY.md updated so context survives the respawn
-- For long operations, use the Rolling Restart pattern (Chapter 4)
+- For long operations, use the Rolling Restart pattern ([Chapter 4](04-lifecycle.md))
 
 ---
 
@@ -184,7 +184,7 @@ When I complete a task, I MUST:
 **Root cause:** The agent went idle without writing a final report. Or the agent wrote the report once and never updated it.
 
 **Prevention:**
-- report.json must be updated at every state change (Chapter 6)
+- report.json must be updated at every state change ([Chapter 6](06-report-discipline.md))
 - Agents must write a final ✅ report at session end
 - Auditors compare report timestamps with agent status — stale report + idle status = flag
 

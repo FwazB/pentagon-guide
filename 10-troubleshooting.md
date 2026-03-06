@@ -264,7 +264,7 @@ A related but distinct scenario: the replacement agent has an **empty** MEMORY.m
 2. If you need the missing context, check the agent's MEMORY.md for any notes it wrote during the lost session
 3. Check other agents' inboxes for messages sent during the gap — those provide a partial record
 
-**Prevention:** Keep Pentagon updated. Session history reliability has improved across recent versions.
+**Prevention:** Keep Pentagon updated. Session history is reliable on v1.2.6+.
 
 ---
 

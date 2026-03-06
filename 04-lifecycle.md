@@ -4,7 +4,7 @@
 
 Pentagon agents aren't permanent processes. They exhaust context windows, crash, complete their mission, or simply need fresh starts. The lifecycle system — spawning, heartbeat, dormancy, and respawning — determines whether these transitions are graceful or catastrophic.
 
-**Performance note:** Pentagon's scaling performance has improved significantly. Community members report running 50+ agents smoothly on 16GB RAM. If you're experiencing performance issues, upgrade to the latest release before changing your agent configuration.
+**Performance note:** Pentagon handles scale well. Community members report running 50+ agents smoothly on 16GB RAM. If you're experiencing performance issues, upgrade to the latest release before changing your agent configuration.
 
 ---
 
@@ -306,4 +306,4 @@ When multiple agents have stale context, conflicting task boards, or broken UUID
 
 ---
 
-Next: [Chapter 5 — The Auditor Pattern](05-auditor-pattern.md) — Independent monitoring that catches what the hierarchy misses.
+Next: [Chapter 4b — A2A Communication](04b-a2a-communication.md) — How agent-to-agent messaging works end-to-end.

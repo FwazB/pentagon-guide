@@ -58,7 +58,7 @@ Pentagon ships with several built-in skills:
 | `/manage-pentagon-role` | Create organizational roles |
 | `/manage-pentagon-worktree` | Create and manage git worktrees |
 
-These are the backbone of multi-agent coordination. `/send-pentagon-message` in particular is the primary communication mechanism (see [Chapter 2](02-communication.md)). It was updated to use the Write tool natively for delivery, which reduced token usage and simplified the message delivery path.
+These are the backbone of multi-agent coordination. `/send-pentagon-message` in particular is the primary communication mechanism (see [Chapter 2](02-communication.md)). It uses the Write tool natively for delivery, which reduces token usage and simplifies the message delivery path.
 
 ### Writing Custom Skills
 
