@@ -12,6 +12,8 @@ Think of it as mission control: you spawn agents, assign them roles and projects
 
 Pentagon is actively developed by [Dark Research](https://darkresearch.ai), with frequent releases focused on performance, reliability, and developer experience. The project has a growing community of developers running multi-agent teams in production.
 
+> **Note:** This is an independent community guide, not affiliated with or endorsed by Dark Research or Pentagon. It reflects the author's experience and the community's collective knowledge.
+
 ## Why This Guide?
 
 Pentagon's [official docs](https://docs.darkresearch.ai/pentagon) cover installation and features. This guide covers what happens *after* setup — the operational patterns, failure modes, and coordination strategies that emerge when you actually run multi-agent teams. It's the difference between knowing what buttons to press and knowing how to run a team effectively.
@@ -57,6 +59,7 @@ Each chapter stands alone. Read them in order for the full picture, or jump to w
 | [2. Communication](02-communication.md) | Messaging, the #1 rule, verification | Running 2+ agents |
 | [3. Hierarchy Design](03-hierarchy-design.md) | Team structure, teams & roles, the no-code-manager rule | Running 5+ agents |
 | [4. Agent Lifecycle](04-lifecycle.md) | Heartbeat, dormancy, respawning | Managing agent uptime |
+| [4b. A2A Communication](04b-a2a-communication.md) | How agent-to-agent messaging works end-to-end | Understanding or debugging A2A |
 | [5. The Auditor Pattern](05-auditor-pattern.md) | Independent monitoring and gap detection | Running 5+ agents |
 | [6. Report Discipline](06-report-discipline.md) | Making the canvas useful | Always |
 | [7. Skills and Tools](07-skills-and-tools.md) | Custom skills, hooks, tool patterns | Extending capabilities |
@@ -67,3 +70,4 @@ Each chapter stands alone. Read them in order for the full picture, or jump to w
 ---
 
 *By Fawaz B — [@Fwazsol](https://twitter.com/Fwazsol) · [GitHub](https://github.com/FwazB)*
+*This is an independent community guide, not affiliated with Dark Research or Pentagon.*
