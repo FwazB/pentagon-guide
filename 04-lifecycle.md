@@ -4,7 +4,7 @@
 
 Pentagon agents aren't permanent processes. They exhaust context windows, crash, complete their mission, or simply need fresh starts. The lifecycle system — spawning, heartbeat, dormancy, and respawning — determines whether these transitions are graceful or catastrophic.
 
-**Performance note:** Recent Pentagon releases have improved scaling performance. Community members report running 50+ agents smoothly on 16GB RAM. If you're experiencing performance issues, upgrade to the latest release before changing your agent configuration.
+**Performance note:** Pentagon's scaling performance has improved significantly. Community members report running 50+ agents smoothly on 16GB RAM. If you're experiencing performance issues, upgrade to the latest release before changing your agent configuration.
 
 ---
 
@@ -205,7 +205,7 @@ Every Claude model has a finite context window. As an agent works — reading fi
 
 ### Using /clear as a Lighter Reset
 
-Claude Code's `/clear` command resets the agent's conversational context without a full respawn. Pentagon now preserves session history through `/clear` — your agent's transcript continues uninterrupted. This is useful when an agent's context is getting heavy but you don't want the overhead of a full respawn (UUID change, identity re-read, etc.).
+Claude Code's `/clear` command resets the agent's conversational context without a full respawn. Pentagon preserves session history through `/clear` — your agent's transcript continues uninterrupted. This is useful when an agent's context is getting heavy but you don't want the overhead of a full respawn (UUID change, identity re-read, etc.).
 
 `/clear` also fixes **cross-provider session corruption** — when running mixed-provider sessions (e.g., Anthropic + Kimi), the session context can become corrupted, causing 400 errors. A `/clear` sanitizes the session state and resolves this.
 
@@ -215,7 +215,7 @@ Claude Code's `/clear` command resets the agent's conversational context without
 
 ### Seamless Branch Switching
 
-Pentagon now supports seamless branch switching mid-session. When you switch an agent's branch via the Pentagon UI, the agent's working directory updates without killing the process — it uses `--resume` to maintain conversational context.
+Pentagon supports seamless branch switching mid-session. When you switch an agent's branch via the Pentagon UI, the agent's working directory updates without killing the process — it uses `--resume` to maintain conversational context.
 
 This means you don't need separate agents for sequential work on different branches. A single agent can finish a feature branch, switch to another, and keep working — no respawn, no context loss.
 

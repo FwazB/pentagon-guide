@@ -8,9 +8,9 @@
 
 [Pentagon](https://pentagon.run) is a native macOS application that lets you manage multiple AI agents from a single screen. Each agent runs as an independent Claude Code process with its own identity, memory, tasks, and map. Pentagon gives you a spatial canvas where every agent appears as a desk — you can see who's active, who's idle, who needs help, and what everyone is working on, all at a glance.
 
-Think of it as mission control: you spawn agents, assign them roles and projects, organize them into teams and roles, and watch them work in parallel. Pentagon handles process isolation (via git worktrees), file isolation (via scope guard), status monitoring, and lifecycle management (via heartbeat) so you can focus on directing the work.
+Think of it as mission control: you spawn agents, assign them to projects, organize them into teams and roles, and watch them work in parallel. Pentagon handles process isolation (via git worktrees), file isolation (via scope guard), status monitoring, and lifecycle management (via heartbeat) so you can focus on directing the work.
 
-Pentagon is actively developed by [Dark Research](https://darkresearch.ai), with frequent releases focused on performance, reliability, and developer experience. The project has a community of developers exploring multi-agent workflows.
+Pentagon is developed by [Dark Research](https://darkresearch.ai), with frequent releases focused on performance, reliability, and developer experience. It has an active community of developers exploring multi-agent workflows.
 
 > **Note:** This is an independent community guide, not affiliated with or endorsed by Dark Research or Pentagon. It reflects the author's experience and the community's collective knowledge.
 
@@ -35,17 +35,17 @@ Technical developers who want to get the most out of Pentagon. Whether you just 
 
 ## Community
 
-Pentagon has an active community on Telegram where the developers and users hang out. **@pentagonpenty** — Pentagon's CX bot — is available in the group for real-time questions about features, configuration, and troubleshooting. For bugs and feature requests, the Discord and GitHub channels are your best bet.
+Pentagon has an active community on Telegram where developers and users discuss features, share patterns, and troubleshoot. **@pentagonpenty** — Pentagon's CX bot — is available in the group for real-time questions about features, configuration, and troubleshooting. For bugs and feature requests, the Discord and GitHub channels are your best bet.
 
 ## What's Coming
 
-Pentagon is under active development. Based on public announcements, features on the near-term roadmap include:
+Based on public announcements, Pentagon's near-term roadmap includes:
 
 - **Agent-specific configs** — Per-agent Claude configuration (currently config is at the machine level)
 - **Agent sandboxes** — Local process isolation for agents, improving security and robustness
 - **Hosted agents** — Cloud-hosted agents that run independently of your local machine
 - **Multiplayer** — Multi-user collaboration on the same Pentagon instance
-- **Multi-provider support** — Native support for non-Claude models (Kimi now supported — cross-provider sessions are live, with session sanitation to prevent corruption)
+- **Multi-provider support** — Native support for non-Claude models (Kimi supported — cross-provider sessions work, with session sanitation to prevent corruption)
 
 This guide will be updated as new features become available.
 

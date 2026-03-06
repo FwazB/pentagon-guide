@@ -159,7 +159,7 @@ When I complete a task, I MUST:
 
 **Impact:** Messages fail to deliver. File operations silently fail. The agent may not realize the delivery failed, or may retry the same blocked approach repeatedly.
 
-**Root cause:** Pentagon enforces file isolation between agents. The scope guard (a PreToolUse hook) blocks all cross-agent writes except inbox delivery via the Write tool. Since `/send-pentagon-message` now uses the Write tool natively, this pitfall is less common for message delivery — but still applies to any manual cross-agent file operations.
+**Root cause:** Pentagon enforces file isolation between agents. The scope guard (a PreToolUse hook) blocks all cross-agent writes except inbox delivery via the Write tool. Since `/send-pentagon-message` uses the Write tool natively, this pitfall is less common for message delivery — but still applies to any manual cross-agent file operations.
 
 **What the scope guard blocks:**
 - Bash commands with redirects (`>`, `>>`) to other agent directories

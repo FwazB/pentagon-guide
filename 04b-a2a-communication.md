@@ -290,10 +290,10 @@ Pentagon currently injects messages through Claude Code's terminal interface. Th
 - Each injection consumes context tokens (the notification text)
 - Duplicate injection bugs stem from the TUI injection path
 
-Based on community discussion, breaking out of the TUI for injection would likely simplify the architecture significantly.
+Community consensus is that breaking out of the TUI for injection would simplify the architecture significantly.
 
 ### Single-Machine Boundary
-A2A communication is local file I/O — no network transport. All agents must run on the same machine. There's no built-in way to send a message to an agent on a different computer (yet).
+A2A communication is local file I/O — no network transport. All agents must run on the same machine. There's no built-in way to send a message to an agent on a different computer.
 
 ### No Guaranteed Ordering
 Messages are delivered in approximately the order they're detected, but there's no strict ordering guarantee. If Agent A sends messages M1 and M2 in rapid succession, the recipient might process M2 before M1 if detection timing varies. For order-dependent workflows, use `replyTo` chains to establish explicit sequencing.

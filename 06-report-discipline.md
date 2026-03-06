@@ -152,7 +152,7 @@ The primary dashboard. Each agent is a desk with a status ring and sticky note.
 
 **Canvas features:**
 
-- **Zoom controls** — Multi-level grid system lets you zoom in for detail or zoom out for the big picture. Dense label handling keeps things readable at any level.
+- **Zoom controls** — Multi-level grid system lets you zoom in for detail or zoom out for the big picture. Labels stay readable at any zoom level.
 - **Auto-layout** — Pentagon can automatically arrange agents on the canvas with undo support. Useful when your layout gets messy after adding several agents.
 - **Multi-select** — Select multiple agents to move, configure, or manage them as a group.
 - **Keyboard shortcuts** — Canvas operations have keyboard shortcuts for fast navigation and agent management.
@@ -172,7 +172,7 @@ Pentagon's menu bar gives you a persistent, at-a-glance view without switching t
 - **Live agent status** — See which agents are active, idle, or need attention, sorted by activity
 - **Claude plan usage** — Real usage limits display so you know your remaining capacity
 
-The menu bar is especially useful when you're working in other apps and want to keep tabs on your agents. Pentagon's menu bar monitoring has minimal system overhead even with many agents running.
+The menu bar is especially useful when you're working in other apps and want to keep tabs on your agents. Menu bar monitoring adds minimal overhead, even with many agents.
 
 ### Multi-Terminal View
 

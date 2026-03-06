@@ -135,7 +135,7 @@ The agent hit the crash cap after repeated failures.
 
 **Prevention:**
 - For long-running cross-provider agents, schedule periodic `/clear` cycles
-- Pentagon's session sanitation (v1.2.7+) handles many cases automatically. Sessions now survive /clear (v1.2.6+), so running /clear won't lose your session history — you can use it freely as a first-line fix.
+- Pentagon's session sanitation (v1.2.7+) handles many cases automatically. Sessions survive /clear (v1.2.6+), so running /clear won't lose your session history — you can use it freely as a first-line fix.
 - If 400 errors persist after `/clear`, respawn the agent
 
 ---
@@ -168,7 +168,7 @@ After a laptop sleep/wake cycle, A2A messaging can fail to reconnect properly.
 2. Re-send any messages that were sent during the sleep/wake window
 3. Pentagon's injection verification retries automatically, but manual restart resolves persistent issues
 
-**Improved in v1.2.8:** Pentagon now programmatically verifies message injection and retries on failure (30s retry window). Startup message flurry is also prevented — delivery is staggered when agents wake with pending messages. Post-sleep reliability is significantly better on v1.2.8+.
+**Improved in v1.2.8:** Pentagon programmatically verifies message injection and retries on failure (30s retry window). Startup message flurry is also prevented — delivery is staggered when agents wake with pending messages. Post-sleep reliability is significantly better on v1.2.8+.
 
 ---
 
@@ -257,14 +257,14 @@ A related but distinct scenario: the replacement agent has an **empty** MEMORY.m
 
 **Symptoms:** Reviewing an agent's session history at `~/.pentagon/sessions/{uuid}/` reveals missing conversation segments — jumps in the transcript, or entire sessions not recorded.
 
-**Cause:** Earlier versions had issues with /clear breaking session tracking. v1.2.6 made sessions survive /clear, and v1.2.7 added less aggressive session sanitation for cross-provider support. Both fixes together mean /clear is now safe to use without losing history.
+**Cause:** Earlier versions had issues with /clear breaking session tracking. v1.2.6 made sessions survive /clear, and v1.2.7 added less aggressive session sanitation for cross-provider support. Both fixes together mean /clear is safe to use without losing history.
 
 **Fix:**
 1. Update Pentagon to the latest version
 2. If you need the missing context, check the agent's MEMORY.md for any notes it wrote during the lost session
 3. Check other agents' inboxes for messages sent during the gap — those provide a partial record
 
-**Prevention:** Keep Pentagon updated. Session history reliability is actively improving.
+**Prevention:** Keep Pentagon updated. Session history reliability has improved across recent versions.
 
 ---
 

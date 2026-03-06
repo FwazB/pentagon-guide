@@ -395,7 +395,7 @@ A detailed log of agent activity. Pentagon writes this continuously. Useful for 
 
 ### Session History
 
-Conversation transcripts are automatically preserved at `~/.pentagon/sessions/{uuid}/`. Each session appends to a continuous file, giving every agent a complete lifetime record. You don't manage this — it happens automatically. Session history reliability has improved significantly — `/clear` now preserves session continuity, and cross-provider session corruption has been addressed. If you still notice gaps, updating to the latest Pentagon version usually resolves them.
+Conversation transcripts are automatically preserved at `~/.pentagon/sessions/{uuid}/`. Each session appends to a continuous file, giving every agent a complete lifetime record. You don't manage this — it happens automatically. Session history reliability has improved significantly — `/clear` preserves session continuity, and cross-provider session corruption has been addressed. If you still notice gaps, updating to the latest Pentagon version usually resolves them.
 
 ---
 

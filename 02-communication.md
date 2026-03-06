@@ -80,9 +80,9 @@ Key fields:
 
 ## Atomic Message Delivery
 
-Pentagon delivers messages directly via the Write tool — a single atomic file creation at `{recipient-inbox}/{messageId}.json`. No temp files, no renames. The Write tool ensures the message is either fully written or not present, preventing partial reads.
+Pentagon delivers messages via the Write tool — a single atomic file creation at `{recipient-inbox}/{messageId}.json`. The message is either fully written or not present, preventing partial reads.
 
-The `/send-pentagon-message` skill uses the Write tool natively, which simplifies the delivery path and reduces token usage. Earlier versions used a tmp-file-then-rename approach, but this was replaced in favor of direct Write delivery.
+The `/send-pentagon-message` skill uses the Write tool natively. Earlier versions used a tmp-file-then-rename approach, but direct Write delivery is simpler and saves tokens.
 
 **Scope guard enforcement:** Pentagon's scope guard blocks Bash file operations (`mv`, `cp`, redirects) targeting other agent directories. The **Write tool is the only allowed method** for delivering messages to another agent's inbox. The scope guard also validates that `from.id` matches the sender's agent ID — message spoofing is blocked at the hook level.
 
@@ -103,10 +103,10 @@ This gives you observability into message flow without manually checking inboxes
 
 Pentagon guarantees that messages are never lost, even when the recipient agent is offline:
 
-- **Cold wake safety** — Messages sent to an agent that's dormant or restarting are safely queued. No message loss during cold agent wakes.
+- **Cold wake safety** — Messages sent to a dormant or restarting agent are safely queued until it wakes.
 - **Message quarantine** — Messages that can't be delivered cleanly (unknown sender after a respawn, reply limit exceeded, conversation limit hit) are moved to `inbox-quarantine/` instead of being dropped. Each quarantined message gets a `.verdict.json` file explaining why it was quarantined — `unknownAgent`, `replyLimitExceeded`, or `conversationLimitExceeded`. This means messages are never silently lost — even failed deliveries are recoverable.
 - **TTL-based cleanup** — Old messages are cleaned up automatically after their time-to-live expires, preventing inbox bloat.
-- **Sleep/wake resilience** — A2A messaging handles edge cases where agents struggle to reconnect after the host machine sleeps and wakes (e.g., closing a laptop overnight). Recent versions have improved this significantly.
+- **Sleep/wake resilience** — A2A messaging handles reconnection after the host machine sleeps and wakes. v1.2.8+ improved this significantly with injection verification and retry.
 - **Injection verification** — Pentagon verifies that messages are actually injected into the recipient agent's conversation context, with automatic retry on failure. This prevents the "delivered but never read" class of bugs.
 - **Startup flurry prevention** — When an agent starts with multiple pending inbox messages, Pentagon staggers delivery to prevent overwhelming the agent's context in the first few seconds. Messages arrive in order but with enough spacing for the agent to process each one.
 
@@ -122,7 +122,7 @@ If you find yourself wanting agents on different maps to talk to each other, tha
 
 ### What If I Used to Do Cross-Workspace Messaging?
 
-Earlier versions of Pentagon (before v1.2.12) used "workspaces" where maps now exist. Some users ran agents across workspaces with relay agents and delivery verification. That pattern is no longer supported. Maps solidify the boundary that workspaces always intended.
+Earlier versions of Pentagon (before v1.2.12) used "workspaces" where maps exist. Some users ran agents across workspaces with relay agents and delivery verification. That pattern is no longer supported. Maps solidify the boundary that workspaces always intended.
 
 **Migration path:**
 - Move agents that need to communicate onto the same map (you can cut/copy and paste agents and teams across maps)

@@ -223,7 +223,7 @@ Focus on interactivity and transition smoothness.
 
 **6. Clean up** — Terminate the losing agent and delete its worktree.
 
-**Tip: Sequential branch work doesn't need separate agents.** Pentagon now supports seamless branch switching mid-session — an agent's working directory updates via `--resume` without killing the process. If your exploration is sequential (try approach A, then try approach B), a single agent can switch branches and keep working. Use the A/B pattern when you want **parallel** exploration — both approaches running simultaneously.
+**Tip: Sequential branch work doesn't need separate agents.** Pentagon supports seamless branch switching mid-session — an agent's working directory updates via `--resume` without killing the process. If your exploration is sequential (try approach A, then try approach B), a single agent can switch branches and keep working. Use the A/B pattern when you want **parallel** exploration — both approaches running simultaneously.
 
 ---
 
