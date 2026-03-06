@@ -4,6 +4,8 @@
 
 Chapter 8 covers pitfalls — preventive patterns you apply *before* things go wrong. This chapter is for when things already went wrong. It's organized by symptom: you see the error, you find it here, you fix it.
 
+> **Pentagon version note:** This chapter was last updated against Pentagon v1.2.15. Performance optimizations in v1.2.5+ support 50+ agents on 16GB RAM without beach balls, and v1.2.6+ loads 100+ agents in realtime on app open. If you're on an older version, some issues described here may already be fixed — keep Pentagon updated.
+
 ---
 
 ## Agent Dies Mid-Session
@@ -74,6 +76,24 @@ macOS kills processes during memory pressure, sleep/wake cycles, or system updat
 - Use Always On heartbeat for agents that must survive sleep/wake
 - Design for async — never assume an agent will stay alive through a laptop close
 
+### 5. Accidental Termination (Human Error)
+
+You hit Terminate on the wrong agent, or closed a terminal you meant to keep. The agent is gone — no crash, no error, just a deliberate kill that shouldn't have happened.
+
+**What makes this different from a crash:** The agent may have been mid-session with an empty MEMORY.md. A crashed agent had time to write context. A freshly spawned agent that gets terminated before it writes anything leaves you with blank identity files.
+
+**Fix:**
+1. Spawn a replacement agent with the same SOUL.md, PURPOSE.md, and tasks.json
+2. Check MEMORY.md — if it's empty (not stale, but blank), the agent must reconstruct manually:
+   - Read SOUL.md and PURPOSE.md to re-establish identity
+   - Run `git log --oneline -20` in the project repo to see recent work
+   - Read the most recent files the agent was working on
+   - Check session history at `~/.pentagon/sessions/{old-uuid}/` for any transcripts
+3. Update tasks.json to reflect accurate status before the replacement agent starts
+4. Notify any agents that were communicating with the terminated agent — they need the new UUID (see pitfall #5: Stale UUID References)
+
+**Prevention:** Keep MEMORY.md populated continuously. An agent that writes to MEMORY.md after every significant action can be terminated and replaced with minimal disruption.
+
 ---
 
 ## Agent Stuck in Error State (Red Ring)
@@ -115,7 +135,7 @@ The agent hit the crash cap after repeated failures.
 
 **Prevention:**
 - For long-running cross-provider agents, schedule periodic `/clear` cycles
-- Pentagon's session sanitation (v1.2.7+) handles many cases automatically
+- Pentagon's session sanitation (v1.2.7+) handles many cases automatically. Sessions now survive /clear (v1.2.6+), so running /clear won't lose your session history — you can use it freely as a first-line fix.
 - If 400 errors persist after `/clear`, respawn the agent
 
 ---
@@ -124,7 +144,7 @@ The agent hit the crash cap after repeated failures.
 
 **Symptoms:** An agent sends a message via `/send-pentagon-message` but the recipient never receives it. Or: the sender's terminal shows success but the recipient's inbox is empty.
 
-### Same-Workspace Delivery Failure
+### Same-Map Delivery Failure
 
 **Diagnosis:** Check the recipient's inbox directory: `ls -lt ~/.pentagon/agents/{recipient-uuid}/inbox/`. Check the sender's delivery receipts: `~/.pentagon/agents/{sender-uuid}/delivery-receipts.jsonl`.
 
@@ -133,14 +153,11 @@ The agent hit the crash cap after repeated failures.
 2. Re-send the message
 3. Check `inbox-quarantine/` on the recipient — messages may have been quarantined due to reply limits or unknown sender
 
-### Cross-Workspace Delivery Failure
+### Cross-Map Delivery
 
-Cross-workspace messaging is less reliable. The Write tool may report success but the file doesn't persist.
+As of v1.2.12, agents on different maps cannot communicate with each other. Maps are hard boundaries. If you're seeing delivery failures between agents that used to be on different "workspaces," they now need to be on the same map.
 
-**Fix:**
-1. Route through a relay agent in the recipient's workspace
-2. Have the human relay the message manually
-3. Always verify cross-workspace delivery by listing the target inbox after sending
+**Fix:** Move the agents onto the same map (you can cut/copy and paste agents and teams across maps in the map picker). Once on the same map, delivery is reliable.
 
 ### Post-Sleep Delivery Failure
 
@@ -150,6 +167,8 @@ After a laptop sleep/wake cycle, A2A messaging can fail to reconnect properly.
 1. Restart the affected agents
 2. Re-send any messages that were sent during the sleep/wake window
 3. Pentagon's injection verification retries automatically, but manual restart resolves persistent issues
+
+**Improved in v1.2.8:** Pentagon now programmatically verifies message injection and retries on failure (30s retry window). Startup message flurry is also prevented — delivery is staggered when agents wake with pending messages. Post-sleep reliability is significantly better on v1.2.8+.
 
 ---
 
@@ -198,6 +217,10 @@ After a laptop sleep/wake cycle, A2A messaging can fail to reconnect properly.
 
 **Cause:** Identity files are stale. The agent re-reads SOUL.md, MEMORY.md, PURPOSE.md, and tasks.json on restart. If these weren't updated before the crash, the agent picks up where the *files* say it should — not where it *actually* was.
 
+A related but distinct scenario: the replacement agent has an **empty** MEMORY.md, not a stale one. This happens when an agent is terminated early in its session before it had a chance to write any memory. Stale files mislead; empty files leave the agent flying blind. The fix differs:
+- **Stale MEMORY.md**: update it with current state, then restart
+- **Empty MEMORY.md**: the replacement must actively reconstruct — read SOUL.md, check git log, read recent work files, review session history. Don't just restart and hope the agent figures it out.
+
 **Fix:**
 1. Before restarting, check the identity files:
    - `tasks.json` — Are statuses accurate? Mark completed items as "done"
@@ -221,10 +244,12 @@ After a laptop sleep/wake cycle, A2A messaging can fail to reconnect properly.
 
 **Fix:**
 1. Check the agent's actual working directory: `pwd` in the terminal
-2. Verify the agent's workspace path in ORGANIZATION.md
+2. Verify the agent's map path in ORGANIZATION.md
 3. If the path is wrong, the agent may have been spawned with incorrect config — respawn with the correct directory
 
 **Common gotcha:** An agent using `git worktree add` directly (bypassing Pentagon) creates worktrees in a different location that Pentagon doesn't track. Always use Pentagon's spawn flow or `/manage-pentagon-worktree`.
+
+**Branch switching (v1.2.9+):** Switching branches or worktrees no longer kills the agent. Pentagon uses `--resume` under the hood to continue the agent's session after the switch — it should feel seamless. Use `/manage-pentagon-worktree` or tell the agent to switch branches; it knows the right way to handle it.
 
 ---
 
@@ -232,7 +257,7 @@ After a laptop sleep/wake cycle, A2A messaging can fail to reconnect properly.
 
 **Symptoms:** Reviewing an agent's session history at `~/.pentagon/sessions/{uuid}/` reveals missing conversation segments — jumps in the transcript, or entire sessions not recorded.
 
-**Cause:** Earlier Pentagon versions had issues with `/clear` breaking session history tracking. This was fixed in v1.2.7+ — `/clear` now preserves session continuity.
+**Cause:** Earlier versions had issues with /clear breaking session tracking. v1.2.6 made sessions survive /clear, and v1.2.7 added less aggressive session sanitation for cross-provider support. Both fixes together mean /clear is now safe to use without losing history.
 
 **Fix:**
 1. Update Pentagon to the latest version
@@ -259,7 +284,7 @@ After a laptop sleep/wake cycle, A2A messaging can fail to reconnect properly.
   ...
 ```
 
-**Cause:** A bug in Pentagon's A2A message injection layer. The message was delivered once to the inbox, but the injection system re-injects it into the agent's conversation repeatedly. This can happen to agents that have been running normally all day — it's not limited to startup or wake scenarios. Known bug as of v1.2.9; Edgar is actively hunting it.
+**Cause:** A bug in Pentagon's A2A message injection layer. The message was delivered once to the inbox, but the injection system re-injects it into the agent's conversation repeatedly. This can happen to agents that have been running normally all day — it's not limited to startup or wake scenarios. First reported around v1.2.8. The startup flurry variant was fixed in v1.2.8 with programmatic injection verification and auto-retry. The mid-session variant (duplicates appearing during normal operation, not on startup) is still being investigated.
 
 **Impact:**
 - Agent burns through context window acknowledging duplicates instead of doing real work
@@ -273,11 +298,11 @@ After a laptop sleep/wake cycle, A2A messaging can fail to reconnect properly.
 4. Check if the agent sent duplicate replies during the flood and notify affected agents
 
 **Prevention:**
-- No user-side prevention currently — this is a Pentagon-level bug being fixed
+- The startup variant is fixed (v1.2.8). For mid-session duplicates, no user-side prevention yet — this is a Pentagon-level bug being fixed
 - If an agent starts logging duplicate acknowledgments, intervene quickly with `/clear` before it burns too much context
 - Agents can add a MEMORY.md note: "If I see the same message injected multiple times, acknowledge once and ignore subsequent duplicates"
 
-**Status:** Known issue, actively being patched. Keep Pentagon updated.
+**Status:** Partially addressed. v1.2.8 fixed the startup flurry variant and added programmatic injection verification with auto-retry. If you see duplicates mid-session (not on startup), that variant is still being investigated — `/clear` or respawn resolves it. Keep Pentagon updated.
 
 ---
 
@@ -334,6 +359,7 @@ When something goes wrong and you're not sure where to start:
 5. **Red ring doesn't always mean dead.** Check the terminal before restarting — it might be a stale detection false positive.
 6. **The crash cap is your friend.** It prevents restart storms. When it triggers, fix the root cause, then restart manually.
 7. **Design for death.** Agents will crash. Build your workflows so that any agent can die and be replaced without losing significant progress.
+8. **Empty MEMORY.md and stale MEMORY.md are different problems.** A stale MEMORY.md needs updating. An empty one (from a fresh agent terminated early) needs active reconstruction — git log, recent files, session history. A replacement that skips this step will start from scratch as if the project is new.
 
 ---
 

@@ -362,39 +362,45 @@ You have multiple teams (e.g., Frontend, Backend, Infrastructure) and need a rev
 
 ---
 
-## Recipe 10: Workspace Organization
+## Recipe 10: Map Organization
 
 ### Situation
-You're running agents across multiple projects and need to keep them organized. Workspaces are mandatory in Pentagon — every agent belongs to one.
+You're running agents across multiple projects and need to keep them organized. Maps are mandatory in Pentagon — every agent belongs to one. When you open Pentagon, the first view is a map picker (like Figma's file picker).
 
 ### Steps
 
-**1. Design your workspace layout**
+**1. Design your map layout**
 
-Each workspace corresponds to a project, repo, or concern:
+Each map corresponds to a project, repo, or concern:
 
-| Workspace | Purpose | Agents |
-|-----------|---------|--------|
+| Map | Purpose | Agents |
+|-----|---------|--------|
 | `backend-api` | API development | Lead, 2 managers, 6 workers |
 | `mobile-app` | Mobile frontend | Lead, 1 manager, 3 workers |
 | `infrastructure` | CI/CD, deployment | 1 manager, 2 workers |
 | `operations` | Auditing, monitoring | Auditor, status bot |
 
-**2. Create workspaces before agents**
+Many users only need one map — don't create multiple maps unless you have genuinely separate concerns.
 
-Workspaces must exist before you can spawn agents into them. Create them through the Pentagon UI.
+**2. Create maps before agents**
 
-**3. Assign each agent to the right workspace at spawn time**
+Maps must exist before you can spawn agents into them. Create them through the Pentagon map picker.
 
-You can't change an agent's workspace after creation — pick the right one upfront.
+**3. Assign each agent to the right map at spawn time**
 
-**4. Cross-workspace communication**
+You can't change an agent's map after creation — pick the right one upfront.
 
-Agents in different workspaces can message each other via `/send-pentagon-message` as long as they're visible in each other's `directory.json`. Cross-workspace messaging uses the same inbox protocol as same-workspace messaging.
+**4. Maps are hard boundaries**
 
-**5. Shared resources**
+Agents on different maps cannot communicate with each other. This is by design — maps are the highest level of separation in Pentagon. If agents need to coordinate, they belong on the same map. Use teams for separation *within* a map.
 
-If multiple workspaces need the same skill, install it at the role or global level rather than duplicating it per-agent.
+**5. Reorganizing across maps**
+
+You can cut/copy and paste agents and teams across maps. Copy clones the agent (it won't be linked to the original). This makes it easy to reorganize if your map layout needs to change.
+
+**6. Shared resources**
+
+If multiple maps need the same skill, install it at the role or global level rather than duplicating it per-agent.
 
 ---
 
@@ -475,7 +481,7 @@ No regressions detected. Tests passing.
 ## Recipe 12: Establishing Hard Rules
 
 ### Situation
-You need workspace-level constraints that every agent follows and that survive across sessions.
+You need map-level constraints that every agent follows and that survive across sessions.
 
 ### Steps
 
@@ -522,7 +528,7 @@ If tests fail on clean HEAD, the failures are pre-existing — not yours. This b
 4. **The auditor makes everything else work.** It catches what you miss. Start it with the team.
 5. **Clean restarts beat debugging tangles.** When the state is bad, reset. It's faster than untangling.
 6. **Separate audit from execution.** The agent that finds issues shouldn't fix them. The agent that fixes them shouldn't approve the push.
-7. **Hard rules in MEMORY.md.** Workspace constraints that survive sessions belong in every agent's memory.
+7. **Hard rules in MEMORY.md.** Map-level constraints that survive sessions belong in every agent's memory.
 
 ---
 

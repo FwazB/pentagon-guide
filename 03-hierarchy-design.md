@@ -10,29 +10,31 @@ A single agent is straightforward. Two or three agents can self-coordinate with 
 
 Pentagon gives you three grouping mechanisms:
 
-### Workspaces (Project-Level)
-Every agent belongs to exactly one workspace — it's assigned at spawn time and can't be changed. A workspace typically maps to a project, repository, or major concern. Think of workspaces as the top-level organizational boundary.
+### Maps (Project-Level)
+Every agent belongs to exactly one map — it's assigned at spawn time and can't be changed. A map typically corresponds to a project, repository, or major concern. Think of maps as the top-level organizational boundary — agents on different maps cannot communicate with each other.
 
-**Best for:** Separating entirely different projects or codebases. A "backend-api" workspace, a "mobile-app" workspace, and an "infrastructure" workspace.
+When you open Pentagon, you see a map picker (similar to Figma's file picker). Each map is its own self-contained canvas. Many users only need one map, and that's perfectly fine.
+
+**Best for:** Separating entirely different projects or codebases. A "backend-api" map, a "mobile-app" map, and an "infrastructure" map.
 
 ### Teams (Spatial)
 Colored rectangular regions on the canvas — like rugs on a floor. Agents placed within a team's boundaries automatically belong to that team. Teams have shared task files, MEMORY.md, and DISCUSSION.md.
 
-**Best for:** Grouping agents within a workspace that work on the same feature or module.
+**Best for:** Grouping agents within a map that work on the same feature or module.
 
 ### Roles (Logical)
 Sidebar-only groupings created manually. Agents are assigned to roles explicitly, regardless of canvas position. Roles also have shared task files, MEMORY.md, and DISCUSSION.md.
 
 **Best for:** Cross-cutting concerns that span multiple projects. A "Review" role might include agents from frontend, backend, and infrastructure teams.
 
-| | Workspaces | Teams | Roles |
+| | Maps | Teams | Roles |
 |---|---|---|---|
-| Scope | Project-level | Within workspace | Cross-cutting |
-| Visibility | Sidebar + canvas | Canvas (spatial) | Sidebar (logical) |
+| Scope | Project-level | Within map | Cross-cutting |
+| Visibility | Map picker + canvas | Canvas (spatial) | Sidebar (logical) |
 | Membership | At spawn (permanent) | Automatic (position-based) | Manual (assigned) |
 | Best for | Project boundaries | Feature clusters | Workflow roles |
 
-You can use all three simultaneously. An agent belongs to the "backend-api" workspace, sits in an "Auth" team on the canvas, and is assigned to a "Code Review" role in the sidebar.
+You can use all three simultaneously. An agent belongs to the "backend-api" map, sits in an "Auth" team on the canvas, and is assigned to a "Code Review" role in the sidebar.
 
 ---
 

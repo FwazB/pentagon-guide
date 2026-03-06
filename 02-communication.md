@@ -114,18 +114,20 @@ These guarantees mean you can send messages to any agent regardless of their cur
 
 ---
 
-## Cross-Workspace Messaging
+## Map Boundaries and Messaging
 
-Agents in different workspaces can message each other as long as they appear in each other's `directory.json`. The inbox protocol is the same — Write tool to the recipient's inbox path.
+Maps are the highest level of separation in Pentagon. **Agents cannot and should not communicate across maps.** This is by design — maps are hard boundaries, not soft groupings.
 
-**However, cross-workspace delivery is less reliable than same-workspace delivery.** Messages written to inboxes in a different workspace can occasionally succeed according to the Write tool but silently fail to persist. This is a known edge case that Pentagon is actively improving.
+If you find yourself wanting agents on different maps to talk to each other, that's a signal your agents belong on the same map. Maps should separate entirely independent concerns (different projects, different clients, different contexts). Agents that need to coordinate belong together.
 
-### Mitigation Strategies
+### What If I Used to Do Cross-Workspace Messaging?
 
-- **Same-workspace delivery is reliable.** Prefer it when possible.
-- **Use a relay agent.** If Agent A (workspace X) needs to reach Agent B (workspace Y), route through an agent that shares a workspace with the recipient. A manager or lead agent often serves as a natural relay.
-- **Always verify delivery.** After writing to a cross-workspace inbox, list the inbox directory to confirm the file actually persists.
-- **User relay as last resort.** If automated relay fails, the human can relay the message directly.
+Earlier versions of Pentagon (before v1.2.12) used "workspaces" where maps now exist. Some users ran agents across workspaces with relay agents and delivery verification. That pattern is no longer supported. Maps solidify the boundary that workspaces always intended.
+
+**Migration path:**
+- Move agents that need to communicate onto the same map (you can cut/copy and paste agents and teams across maps)
+- If you need separation *within* a map, use teams — they provide spatial grouping without communication barriers
+- If your setup is disrupted by the multimap migration, you can downgrade to an older Pentagon version from [pentagon.run](https://pentagon.run) while you reorganize
 
 ---
 

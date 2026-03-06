@@ -193,7 +193,7 @@ Claude Code's Task tool spawns subagents for parallel research or exploration. I
 
 ---
 
-## Workspace and Directory Access
+## Map and Directory Access
 
 ### The Agent's Working Directory
 
@@ -223,7 +223,7 @@ All agents can access `~/.pentagon/` for identity files, inboxes, and coordinati
 ├── roles/{uuid}/        ← Role-level shared files
 ├── hooks/               ← Scope guard hook
 ├── sessions/{uuid}/     ← Conversation transcripts
-├── workspaces/{uuid}/   ← Workspace configurations
+├── workspaces/{uuid}/   ← Map configurations
 ├── roles/               ← Organizational role definitions
 ├── a2a-audit.jsonl      ← Agent-to-agent audit log
 ├── perf-log.jsonl       ← Performance metrics (CPU, I/O, timing)

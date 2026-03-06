@@ -46,7 +46,7 @@ Pentagon's StatusEngine manages transitions deterministically. The same state + 
 ### From the Canvas
 
 1. Click an empty grid cell (or use keyboard shortcuts)
-2. **Select a workspace** (required — every agent must belong to a workspace, and this can't be changed later)
+2. **Select a map** (required — every agent must belong to a map, and this can't be changed later)
 3. Select a project directory
 4. Name the agent
 5. Pick a model (Opus, Sonnet, or Haiku — multi-provider support is rolling out, starting with Kimi)

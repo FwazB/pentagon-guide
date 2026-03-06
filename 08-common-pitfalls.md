@@ -301,7 +301,7 @@ When I complete a task, I MUST:
 
 ## 18. Bypassing Pentagon Worktree Management
 
-**What happens:** An agent uses `git worktree add` directly or Claude Code's `EnterWorktree` to create a worktree. Pentagon doesn't know about it — the worktree doesn't appear in Pentagon's tracking, the agent's workspace path may be wrong, and cleanup doesn't happen automatically.
+**What happens:** An agent uses `git worktree add` directly or Claude Code's `EnterWorktree` to create a worktree. Pentagon doesn't know about it — the worktree doesn't appear in Pentagon's tracking, the agent's map path may be wrong, and cleanup doesn't happen automatically.
 
 **Impact:** Orphaned worktrees accumulate on disk. Pentagon's branch display shows stale information. Other agents can't find the worktree agent's code. Worktree cleanup scripts miss the rogue worktree.
 

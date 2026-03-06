@@ -25,7 +25,7 @@ This chapter covers each file, what goes in it, and the patterns that make them 
 | File | What It Does |
 |------|-------------|
 | **status.json** | Process state → canvas ring color (green/yellow/gray/red) |
-| **ORGANIZATION.md** | Auto-generated org chart — the agent's teams, teammates, workspace |
+| **ORGANIZATION.md** | Auto-generated org chart — the agent's teams, teammates, map |
 | **directory.json** | Machine-readable contact list of visible agents |
 | **agent-card.json** | Agent metadata (name, description, skills) |
 | **delivery-receipts.jsonl** | Message delivery tracking (sent/delivered status) |
@@ -325,7 +325,7 @@ Pentagon gives every agent awareness of its place in the organization through tw
 
 ### ORGANIZATION.md
 
-A human-readable file describing the agent's teams, teammates, workspace, and role peers. Pentagon updates this automatically as you move agents around — you never edit it directly, but agents read it to know who they're working with.
+A human-readable file describing the agent's teams, teammates, map, and role peers. Pentagon updates this automatically as you move agents around — you never edit it directly, but agents read it to know who they're working with.
 
 ```markdown
 # Organization
@@ -334,11 +334,11 @@ A human-readable file describing the agent's teams, teammates, workspace, and ro
 - Name: APIManager <UUID>
 - Position: grid (5, 3)
 
-## Workspace: backend (3 agents)
+## Map: backend (3 agents)
 - Path: /Users/you/project
 - Location: local
 
-### Other agents in this workspace
+### Other agents in this map
 - AuthWorker <UUID> — active
 - DataWorker <UUID> — idle
 ```

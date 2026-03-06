@@ -6,7 +6,7 @@
 
 ## What is Pentagon?
 
-[Pentagon](https://pentagon.run) is a native macOS application that lets you manage multiple AI agents from a single screen. Each agent runs as an independent Claude Code process with its own identity, memory, tasks, and workspace. Pentagon gives you a spatial canvas where every agent appears as a desk — you can see who's active, who's idle, who needs help, and what everyone is working on, all at a glance.
+[Pentagon](https://pentagon.run) is a native macOS application that lets you manage multiple AI agents from a single screen. Each agent runs as an independent Claude Code process with its own identity, memory, tasks, and map. Pentagon gives you a spatial canvas where every agent appears as a desk — you can see who's active, who's idle, who needs help, and what everyone is working on, all at a glance.
 
 Think of it as mission control: you spawn agents, assign them roles and projects, organize them into teams and roles, and watch them work in parallel. Pentagon handles process isolation (via git worktrees), file isolation (via scope guard), status monitoring, and lifecycle management (via heartbeat) so you can focus on directing the work.
 
