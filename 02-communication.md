@@ -106,7 +106,7 @@ Pentagon guarantees that messages are never lost, even when the recipient agent 
 - **Cold wake safety** — Messages sent to an agent that's dormant or restarting are safely queued. No message loss during cold agent wakes.
 - **Message quarantine** — Messages that can't be delivered cleanly (unknown sender after a respawn, reply limit exceeded, conversation limit hit) are moved to `inbox-quarantine/` instead of being dropped. Each quarantined message gets a `.verdict.json` file explaining why it was quarantined — `unknownAgent`, `replyLimitExceeded`, or `conversationLimitExceeded`. This means messages are never silently lost — even failed deliveries are recoverable.
 - **TTL-based cleanup** — Old messages are cleaned up automatically after their time-to-live expires, preventing inbox bloat.
-- **Sleep/wake resilience** — A2A messaging handles edge cases where agents struggle to reconnect after the host machine sleeps and wakes (e.g., closing a laptop overnight). Pentagon actively patches these edge cases as they surface.
+- **Sleep/wake resilience** — A2A messaging handles edge cases where agents struggle to reconnect after the host machine sleeps and wakes (e.g., closing a laptop overnight). Recent versions have improved this significantly.
 - **Injection verification** — Pentagon verifies that messages are actually injected into the recipient agent's conversation context, with automatic retry on failure. This prevents the "delivered but never read" class of bugs.
 - **Startup flurry prevention** — When an agent starts with multiple pending inbox messages, Pentagon staggers delivery to prevent overwhelming the agent's context in the first few seconds. Messages arrive in order but with enough spacing for the agent to process each one.
 

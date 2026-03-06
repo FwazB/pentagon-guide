@@ -4,7 +4,7 @@
 
 Pentagon agents aren't permanent processes. They exhaust context windows, crash, complete their mission, or simply need fresh starts. The lifecycle system — spawning, heartbeat, dormancy, and respawning — determines whether these transitions are graceful or catastrophic.
 
-**Performance note:** Recent Pentagon releases have focused heavily on scaling — the app now runs smoothly with 50+ agents on 16GB RAM, and 100+ agents load in realtime on app open. Earlier versions had CPU and I/O bottlenecks that have been reduced by roughly 50%. If you're experiencing performance issues, upgrade to the latest release before changing your agent configuration.
+**Performance note:** Recent Pentagon releases have improved scaling performance. Community members report running 50+ agents smoothly on 16GB RAM. If you're experiencing performance issues, upgrade to the latest release before changing your agent configuration.
 
 ---
 
@@ -49,7 +49,7 @@ Pentagon's StatusEngine manages transitions deterministically. The same state + 
 2. **Select a map** (required — every agent must belong to a map, and this can't be changed later)
 3. Select a project directory
 4. Name the agent
-5. Pick a model (Opus, Sonnet, or Haiku — multi-provider support is rolling out, starting with Kimi)
+5. Pick a model (Opus, Sonnet, or Haiku — multi-provider support is available, starting with Kimi)
 6. Set permissions (Full Auto or Custom)
 7. Choose branch strategy (existing branch or new worktree)
 8. Click Create

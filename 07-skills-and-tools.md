@@ -146,7 +146,7 @@ The scope guard is auto-generated and auto-managed. You don't need to edit it. I
 
 ### What's Ahead: Agent Sandboxes
 
-Pentagon is developing **agent sandboxes** — local process isolation that goes beyond file-level scope guards. Sandboxes will provide a more robust security boundary between agents, especially for local multi-agent deployments. This will complement (and may eventually replace parts of) the current scope guard system. Watch for this in upcoming releases.
+Pentagon's public roadmap includes **agent sandboxes** — local process isolation that would go beyond file-level scope guards. This would complement (and may eventually replace parts of) the current scope guard system.
 
 ---
 

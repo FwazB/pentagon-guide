@@ -284,7 +284,7 @@ A related but distinct scenario: the replacement agent has an **empty** MEMORY.m
   ...
 ```
 
-**Cause:** A bug in Pentagon's A2A message injection layer. The message was delivered once to the inbox, but the injection system re-injects it into the agent's conversation repeatedly. This can happen to agents that have been running normally all day — it's not limited to startup or wake scenarios. First reported around v1.2.8. The startup flurry variant was fixed in v1.2.8 with programmatic injection verification and auto-retry. The mid-session variant (duplicates appearing during normal operation, not on startup) is still being investigated.
+**Cause:** A bug in Pentagon's A2A message injection layer. The message was delivered once to the inbox, but the injection system re-injects it into the agent's conversation repeatedly. This can happen to agents that have been running normally all day — it's not limited to startup or wake scenarios. First reported around v1.2.8. The startup flurry variant was fixed in v1.2.8 with programmatic injection verification and auto-retry. The mid-session variant (duplicates appearing during normal operation, not on startup) has not been resolved as of v1.2.15.
 
 **Impact:**
 - Agent burns through context window acknowledging duplicates instead of doing real work
@@ -298,11 +298,11 @@ A related but distinct scenario: the replacement agent has an **empty** MEMORY.m
 4. Check if the agent sent duplicate replies during the flood and notify affected agents
 
 **Prevention:**
-- The startup variant is fixed (v1.2.8). For mid-session duplicates, no user-side prevention yet — this is a Pentagon-level bug being fixed
+- The startup variant is fixed (v1.2.8). For mid-session duplicates, no user-side prevention yet — this appears to be a Pentagon-level bug
 - If an agent starts logging duplicate acknowledgments, intervene quickly with `/clear` before it burns too much context
 - Agents can add a MEMORY.md note: "If I see the same message injected multiple times, acknowledge once and ignore subsequent duplicates"
 
-**Status:** Partially addressed. v1.2.8 fixed the startup flurry variant and added programmatic injection verification with auto-retry. If you see duplicates mid-session (not on startup), that variant is still being investigated — `/clear` or respawn resolves it. Keep Pentagon updated.
+**Status:** Partially addressed as of v1.2.15. v1.2.8 fixed the startup flurry variant and added programmatic injection verification with auto-retry. If you see duplicates mid-session (not on startup), that variant has not been fixed yet — `/clear` or respawn resolves it. Keep Pentagon updated.
 
 ---
 

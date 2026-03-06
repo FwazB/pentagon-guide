@@ -122,7 +122,7 @@ This is the current architectural constraint: Pentagon piggybacks on Claude Code
 
 - **Context window pressure** — Each injected message consumes context. Under heavy message volume, the agent's context fills faster.
 - **Injection timing** — If the agent is mid-tool-call when the injection arrives, the message may not be processed until the current operation completes.
-- **Duplicate injection** — A bug (first reported v1.2.8) where the injection system re-injects the same message repeatedly. The startup variant was fixed in v1.2.8; the mid-session variant is still being investigated (see [Troubleshooting](10-troubleshooting.md#duplicate-message-injection-message-flood)).
+- **Duplicate injection** — A bug (first reported v1.2.8) where the injection system re-injects the same message repeatedly. The startup variant was fixed in v1.2.8; the mid-session variant has not been resolved as of v1.2.15 (see [Troubleshooting](10-troubleshooting.md#duplicate-message-injection-message-flood)).
 
 ### Quarantine
 
@@ -290,7 +290,7 @@ Pentagon currently injects messages through Claude Code's terminal interface. Th
 - Each injection consumes context tokens (the notification text)
 - Duplicate injection bugs stem from the TUI injection path
 
-This is an active area of development. Breaking out of the TUI for injection would simplify the architecture significantly.
+Based on community discussion, breaking out of the TUI for injection would likely simplify the architecture significantly.
 
 ### Single-Machine Boundary
 A2A communication is local file I/O — no network transport. All agents must run on the same machine. There's no built-in way to send a message to an agent on a different computer (yet).

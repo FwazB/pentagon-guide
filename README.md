@@ -10,7 +10,7 @@
 
 Think of it as mission control: you spawn agents, assign them roles and projects, organize them into teams and roles, and watch them work in parallel. Pentagon handles process isolation (via git worktrees), file isolation (via scope guard), status monitoring, and lifecycle management (via heartbeat) so you can focus on directing the work.
 
-Pentagon is actively developed by [Dark Research](https://darkresearch.ai), with frequent releases focused on performance, reliability, and developer experience. The project has a growing community of developers running multi-agent teams in production.
+Pentagon is actively developed by [Dark Research](https://darkresearch.ai), with frequent releases focused on performance, reliability, and developer experience. The project has a community of developers exploring multi-agent workflows.
 
 > **Note:** This is an independent community guide, not affiliated with or endorsed by Dark Research or Pentagon. It reflects the author's experience and the community's collective knowledge.
 
@@ -39,7 +39,7 @@ Pentagon has an active community on Telegram where the developers and users hang
 
 ## What's Coming
 
-Pentagon is under active development. Features on the near-term roadmap:
+Pentagon is under active development. Based on public announcements, features on the near-term roadmap include:
 
 - **Agent-specific configs** — Per-agent Claude configuration (currently config is at the machine level)
 - **Agent sandboxes** — Local process isolation for agents, improving security and robustness
@@ -47,7 +47,7 @@ Pentagon is under active development. Features on the near-term roadmap:
 - **Multiplayer** — Multi-user collaboration on the same Pentagon instance
 - **Multi-provider support** — Native support for non-Claude models (Kimi now supported — cross-provider sessions are live, with session sanitation to prevent corruption)
 
-This guide will be updated as these features ship.
+This guide will be updated as new features become available.
 
 ## How to Read This
 

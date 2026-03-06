@@ -172,7 +172,7 @@ Pentagon's menu bar gives you a persistent, at-a-glance view without switching t
 - **Live agent status** — See which agents are active, idle, or need attention, sorted by activity
 - **Claude plan usage** — Real usage limits display so you know your remaining capacity
 
-The menu bar is especially useful when you're working in other apps and want to keep tabs on your agents. With recent performance optimizations (roughly 50% reduction in CPU and I/O usage), Pentagon's menu bar monitoring has minimal system overhead even with many agents running.
+The menu bar is especially useful when you're working in other apps and want to keep tabs on your agents. Pentagon's menu bar monitoring has minimal system overhead even with many agents running.
 
 ### Multi-Terminal View
 

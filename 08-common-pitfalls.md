@@ -225,7 +225,7 @@ When I complete a task, I MUST:
 **Root cause:** Always On heartbeat mode auto-restarts without verifying whether the previous session ended cleanly.
 
 **Prevention:**
-- Pentagon's **crash cap** now prevents this automatically — after repeated crashes, the agent stops restarting and sends a desktop notification
+- Pentagon's **crash cap** prevents this automatically — after repeated crashes, the agent stops restarting and sends a desktop notification
 - If you see the exhaustion notification, **fix the root cause** before manually restarting
 - For agents in development, use **Manual** heartbeat mode until the configuration is stable
 - Test identity files and environment on a Manual agent before switching to Always On
@@ -242,8 +242,8 @@ When I complete a task, I MUST:
 
 **Root cause:** macOS suspends all processes during sleep. On wake, Pentagon restarts agents, but the A2A messaging layer has edge cases around reconnection timing — especially when multiple agents wake simultaneously.
 
-**Recent improvements:**
-- **Injection verification** — Pentagon now verifies that messages are actually injected into recipient conversations, with automatic retry on failure
+**Reliability features (v1.2.8+):**
+- **Injection verification** — Pentagon verifies that messages are actually injected into recipient conversations, with automatic retry on failure
 - **Startup flurry prevention** — When agents wake with pending messages, delivery is staggered to prevent context overload
 
 **Prevention:**
