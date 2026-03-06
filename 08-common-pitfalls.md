@@ -331,6 +331,8 @@ When I complete a task, I MUST:
 | Priority inversion | Priority ordering | SOUL.md + Auditor |
 | Scope guard | Use Write tool for inbox delivery | Skill instructions |
 | Stale reports | Update cadence | SOUL.md |
+| Zsh expansion bugs | Glob-based loops, avoid indexed arrays | Bash scripts |
+| Unverified completion | Verification steps + spot-checks | Task instructions |
 | Restart storms | Crash cap (automatic) + Manual mode for dev | Heartbeat config |
 | A2A after sleep | Update Pentagon + manual restart on wake | Agent config |
 | Subagent task leakage | Clean up subagent tasks | Task management |

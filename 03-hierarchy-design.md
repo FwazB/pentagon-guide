@@ -221,7 +221,7 @@ When a lead sends tasks directly to workers, bypassing the manager:
 
 ### Model Selection by Tier
 
-Pentagon lets you assign different Claude models to each agent. Pentagon supports mixing Claude with other providers (Kimi is currently supported) in the same team:
+Pentagon lets you assign different Claude models to each agent. Pentagon supports mixing Claude with other providers (Kimi is supported) in the same team:
 
 | Tier | Recommended Model | Reasoning |
 |------|------------------|-----------|
