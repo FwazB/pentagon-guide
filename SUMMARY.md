@@ -24,3 +24,4 @@
 ## Reference
 
 * [Troubleshooting](10-troubleshooting.md)
+* [CLAUDE.md Example](CLAUDE.md)

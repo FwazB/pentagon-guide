@@ -66,6 +66,7 @@ Each chapter stands alone. Read them in order for the full picture, or jump to w
 | [8. Common Pitfalls](08-common-pitfalls.md) | Failures and how to prevent them | Before scaling up |
 | [9. Operational Playbook](09-operational-playbook.md) | Step-by-step recipes | When you need a how-to |
 | [10. Troubleshooting](10-troubleshooting.md) | Common errors and fixes | When something breaks |
+| [CLAUDE.md Example](CLAUDE.md) | Project instructions as a working example | Writing your own CLAUDE.md |
 
 ---
 

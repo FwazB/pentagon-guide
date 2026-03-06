@@ -1,6 +1,12 @@
-# Pentagon Guide — Project Instructions
+# CLAUDE.md — Project Instructions in Practice
 
-This is an independent community guide for [Pentagon](https://pentagon.run), a native macOS app for managing multiple AI agents. The guide is published as a GitBook at [github.com/FwazB/pentagon-guide](https://github.com/FwazB/pentagon-guide).
+> *This is a real CLAUDE.md file. It serves as this guide's project instructions and as a working example of how to write one for your own Pentagon projects.*
+
+A `CLAUDE.md` file is a Claude Code convention — a markdown file at the root of a project that Claude Code automatically loads into every agent's context when it starts working in that directory. It's how you give project-level instructions that persist across sessions and agents without putting them in every agent's SOUL.md.
+
+For Pentagon projects, a good CLAUDE.md captures: coding conventions, terminology, version-specific behavior, and operational rules that every agent on the project should follow. What follows is this guide's actual CLAUDE.md — the same file that our agents read when working on the guide.
+
+---
 
 ## Voice and Tone
 
@@ -46,6 +52,7 @@ This guide is **not affiliated with Dark Research or Pentagon**. We are communit
 | `08-common-pitfalls.md` | Common Pitfalls | Advanced |
 | `09-operational-playbook.md` | Operational Playbook | Advanced |
 | `10-troubleshooting.md` | Troubleshooting | Reference |
+| `CLAUDE.md` | CLAUDE.md Example | Reference |
 | `SUMMARY.md` | GitBook navigation | — |
 
 ### Conventions
@@ -90,29 +97,29 @@ Use these version notes when writing about features or fixes. Always cite the ve
 
 ## Workflow
 
-### Author and Editor Model
+### How This Guide Is Maintained
 
-Edits are coordinated through a directing agent and an editing agent working in parallel:
+This guide is maintained by two Pentagon agents working in parallel — a pattern you can replicate for any documentation project:
 
-1. **Director** plans changes, handles conceptual rewrites, reviews editor work, commits, and pushes
-2. **Editor** handles mechanical edits (search-and-replace, auditing, verification) and reports back
-3. **Editor works in a separate git worktree** — changes must be merged into the main repo before committing
+1. **Director agent** plans changes, handles conceptual rewrites, reviews editor work, commits, and pushes
+2. **Editor agent** handles mechanical edits (search-and-replace, auditing, verification) and reports back
+3. **Editor works in a separate git worktree** — changes are merged into the main repo before committing
 4. **All edits are cross-referenced** — editor reports what changed; director reviews before finalizing
 
-### Merge Process
+This is a practical example of the manager-worker pattern from [Chapter 3](03-hierarchy-design.md), adapted for documentation work.
 
-The editor's worktree is isolated. To merge editor changes into the main repo:
+### Worktree Merge Process
+
+When agents work in separate worktrees, merge changes with:
 
 ```bash
 cd {editor-worktree} && git diff {files} | (cd {main-repo} && git apply -)
 ```
 
-Replace `{editor-worktree}` with the editor's worktree path and `{main-repo}` with your local clone.
+Replace `{editor-worktree}` with the editor's worktree path and `{main-repo}` with your local clone. See [Chapter 4 — Git Worktree Isolation](04-lifecycle.md#git-worktree-isolation) for more on Pentagon's worktree model.
 
-### Git
+### Git Conventions
 
-- **Remote:** `github.com:FwazB/pentagon-guide.git`
-- **Branch:** `main`
 - **Commits:** Descriptive one-line summaries. Include scope when touching multiple files: "Quality pass — remove temporal language across 9 files"
 - **Push:** Only after review. Never force-push.
 
@@ -126,3 +133,7 @@ When Pentagon releases a new version:
 4. **Check for terminology changes** — has the UI renamed any concepts?
 5. **Update the version reference table** in this file
 6. **Review the full diff** before committing — ensure community voice rules are followed
+
+---
+
+Back to [README](README.md)
