@@ -22,7 +22,7 @@ Before spawning anything, decide:
 
 **2. Create a team on the canvas**
 
-Switch to Team mode in the canvas toolbar. Draw a rectangular region for your project. Name it and give it a color. You can use **auto-layout** to arrange agents automatically after spawning, then fine-tune positions manually.
+Hold **Shift + click-drag** on the canvas to create a team region of any size. Name it and give it a color. To resize later, hold **Shift** again — the corners light up and you can drag any edge. You can use **auto-layout** to arrange agents automatically after spawning, then fine-tune positions manually.
 
 **3. Spawn the lead agent first**
 

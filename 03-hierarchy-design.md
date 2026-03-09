@@ -20,6 +20,8 @@ When you open Pentagon, you see a map picker (similar to Figma's file picker). E
 ### Teams (Spatial)
 Colored rectangular regions on the canvas — like rugs on a floor. Agents placed within a team's boundaries automatically belong to that team. Teams have shared task files, MEMORY.md, and DISCUSSION.md.
 
+**Creating and resizing teams:** Hold **Shift + click-drag** on the canvas to create a team of any size. To resize an existing team, hold **Shift** again — the corners light up and you can drag any edge to resize.
+
 **Best for:** Grouping agents within a map that work on the same feature or module.
 
 ### Roles (Logical)
