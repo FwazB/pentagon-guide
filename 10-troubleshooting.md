@@ -323,6 +323,27 @@ A related but distinct scenario: the replacement agent has an **empty** MEMORY.m
 
 ---
 
+## Agents Disappear After Quitting and Reopening Pentagon
+
+**Symptoms:** You quit Pentagon and reopen it. Your entire team of agents is gone — the canvas is empty or shows a fresh map. But your agent data is still on disk at `~/.pentagon/agents/`.
+
+**Cause:** When Pentagon restarts, it may delete the old map and create a new one with a new map ID. Existing agents still reference the old map ID in their configuration, so they become invisible to the app — even though all their data (SOUL.md, MEMORY.md, tasks, inbox) is intact on disk.
+
+**Fix:**
+1. Don't panic — your agent data is safe. Nothing was deleted.
+2. Update the `mapId` and `sourceId` fields in each agent's `config.json` to match the newly created map's ID
+3. Copy the desk positions from the old map's layout into the new map's `canvas-layout.json`
+4. Reopen Pentagon — the full team should appear exactly as before
+
+**Finding the new map ID:** Open Pentagon after the restart — it creates a fresh map visible in the map picker. The new map's ID is in its configuration files under `~/.pentagon/`.
+
+**Prevention:**
+- This is a known edge case with Pentagon restarts — community members have reported it
+- Keep backups of your `~/.pentagon/` directory if you're running large teams
+- If it happens, the fix is mechanical — no data is lost, only the map-to-agent references need updating
+
+---
+
 ## Quick Diagnostic Checklist
 
 When something goes wrong and you're not sure where to start:
