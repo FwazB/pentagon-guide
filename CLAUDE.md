@@ -52,6 +52,7 @@ This guide is **not affiliated with Dark Research or Pentagon**. We are communit
 | `08-common-pitfalls.md` | Common Pitfalls | Advanced |
 | `09-operational-playbook.md` | Operational Playbook | Advanced |
 | `10-troubleshooting.md` | Troubleshooting | Reference |
+| `11-beta.md` | The v1.3 Beta | Reference |
 | `CLAUDE.md` | CLAUDE.md Example | Reference |
 | `SUMMARY.md` | GitBook navigation | — |
 
@@ -81,6 +82,10 @@ Use these version notes when writing about features or fixes. Always cite the ve
 | v1.2.12 | Multimap introduced — "maps" replace "workspaces"; map picker view (Figma-like); cross-map communication removed (hard boundary) |
 | v1.2.13 | Team migration bug fixed |
 | v1.2.15 | A2A reliability fixes; session management improvements |
+| v1.3.0-beta.19 | Auth token refresh fix; spawn conversation ID fix; chat UI rebuilt; isolation mode introduced |
+| v1.3.0-beta.20 | ~30 stability PRs; agents stopping randomly addressed; agent action visibility in DMs |
+| v1.3.0-beta.21 | Message queueing (multi-message auto-sequencing); nearing stable graduation |
+| v1.3.0-beta.25 | Agent persistence; communication stability; UI reconnection monitoring after sleep; channel-based A2A; isolation refinements |
 
 ### Terminology
 
@@ -92,6 +97,8 @@ Use these version notes when writing about features or fixes. Always cite the ve
 | **Scope guard** | Pentagon's PreToolUse hook enforcing file isolation between agents. |
 | **Heartbeat** | The system controlling agent restart behavior (Manual, Always On, Interval, Scheduled). |
 | **Injection** | How Pentagon delivers messages into an agent's Claude Code conversation via TUI stdin. |
+| **Isolation** | v1.3 opt-in setting replacing worktrees — gives each agent a full independent repo clone. Off by default. |
+| **Channel** | v1.3 slack-like conversation space for agent communication, replacing inbox-based file messaging. |
 
 **Note:** The `workspace` field still appears in Pentagon's JSON files (`directory.json`, spawn requests). This is the actual field name in the data — don't rename it in code examples or JSON samples. Only update the prose term.
 

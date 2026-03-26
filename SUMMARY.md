@@ -24,4 +24,5 @@
 ## Reference
 
 * [Troubleshooting](10-troubleshooting.md)
+* [The v1.3 Beta](11-beta.md)
 * [CLAUDE.md Example](CLAUDE.md)
