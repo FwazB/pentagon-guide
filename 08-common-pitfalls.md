@@ -18,7 +18,7 @@ Running multi-agent teams with Pentagon surfaces a predictable set of failure mo
 ```markdown
 # Add to every agent's SOUL.md:
 Every decision that affects another agent MUST be sent via
-/send-pentagon-message. report.json is for human visibility only.
+Pentagon's messaging tools. report.json is for human visibility only.
 ```
 
 **Detection:** The auditor pattern ([Chapter 5](05-auditor-pattern.md)) catches this by cross-referencing reports with inbox contents.
@@ -27,7 +27,7 @@ Every decision that affects another agent MUST be sent via
 
 ## 2. The Phantom Dispatch
 
-**What happens:** A manager creates a detailed task list in tasks.json — planning each assignment, writing descriptions, setting priorities. Then it goes dormant or exhausts its context before actually sending the task messages via `/send-pentagon-message`.
+**What happens:** A manager creates a detailed task list in tasks.json — planning each assignment, writing descriptions, setting priorities. Then it goes dormant or exhausts its context before actually sending the task messages via `Pentagon's messaging tools`.
 
 **Impact:** The manager's task board looks active. Worker inboxes are empty. Zero work is happening, but everything looks fine on paper.
 
@@ -131,7 +131,7 @@ If I'm about to write code, I delegate it to a worker instead.
 # In every worker's SOUL.md:
 When I complete a task, I MUST:
 1. Mark it done in tasks.json (with an outcome)
-2. Send a completion message to my manager via /send-pentagon-message
+2. Send a completion message to my manager via Pentagon's messaging tools
 3. Include: what was done, files changed, test results, and blockers
 ```
 
@@ -159,7 +159,7 @@ When I complete a task, I MUST:
 
 **Impact:** Messages fail to deliver. File operations silently fail. The agent may not realize the delivery failed, or may retry the same blocked approach repeatedly.
 
-**Root cause:** Pentagon enforces file isolation between agents. The scope guard (a PreToolUse hook) blocks all cross-agent writes except inbox delivery via the Write tool. Since `/send-pentagon-message` uses the Write tool natively, this pitfall is less common for message delivery — but still applies to any manual cross-agent file operations.
+**Root cause:** Pentagon enforces file isolation between agents. The scope guard (a PreToolUse hook) blocks all cross-agent writes except inbox delivery via the Write tool. On v1.3+, using MCP tools (`send_message`) avoids this issue entirely since messages route through Pentagon's server. This pitfall primarily affects agents using the legacy inbox system or attempting manual cross-agent file operations.
 
 **What the scope guard blocks:**
 - Bash commands with redirects (`>`, `>>`) to other agent directories
@@ -169,8 +169,8 @@ When I complete a task, I MUST:
 - Inbox messages where `from.id` doesn't match the sending agent (spoofing prevention)
 
 **Prevention:**
-- Use the **Write tool** (not Bash, not Edit) to deliver messages to other agent inboxes
-- Ensure the message JSON includes a valid `from.id` matching your agent's UUID
+- On v1.3+: Use MCP tools (`send_message`) for communication — bypasses the scope guard entirely
+- For legacy inbox delivery: Use the **Write tool** (not Bash, not Edit) with a valid `from.id` matching your agent's UUID
 - For non-inbox cross-agent file changes (like UUID updates in SOUL.md), the human must make the change directly or the target agent must update its own files
 
 ---
@@ -299,21 +299,21 @@ When I complete a task, I MUST:
 
 ---
 
-## 18. Bypassing Pentagon Worktree Management
+## 18. Bypassing Pentagon's Isolation Model
 
-**What happens:** An agent uses `git worktree add` directly or Claude Code's `EnterWorktree` to create a worktree. Pentagon doesn't know about it — the worktree doesn't appear in Pentagon's tracking, the agent's map path may be wrong, and cleanup doesn't happen automatically.
+**What happens:** On v1.3+ with isolation mode enabled, an agent manually creates worktrees or clones outside Pentagon's management. On v1.2, an agent uses `git worktree add` directly or Claude Code's `EnterWorktree`, bypassing Pentagon's worktree tracking.
 
-**Impact:** Orphaned worktrees accumulate on disk. Pentagon's branch display shows stale information. Other agents can't find the worktree agent's code. Worktree cleanup scripts miss the rogue worktree.
+**Impact:** Orphaned working copies accumulate on disk. Pentagon can't track the agent's actual working directory. Other agents can't find the rogue agent's code.
 
-**Root cause:** Pentagon manages worktrees through its git wrapper (`~/.pentagon/bin/git`) and stores them at `~/.pentagon/worktrees/`. Direct git worktree commands bypass this system entirely.
+**Root cause:** Pentagon manages code isolation (worktrees on v1.2, clones on v1.3) through its own infrastructure. Direct git commands bypass this entirely.
 
 **Prevention:**
-- Always use Pentagon's spawn flow or `/manage-pentagon-worktree` for worktree creation
+- On v1.3+: Use isolation mode (toggle in settings) — Pentagon manages the clones automatically
+- On v1.2: Use Pentagon's spawn flow or `/manage-pentagon-worktree` for worktree creation
 - Never use `git worktree add` directly inside a Pentagon-managed agent session
 - Never use Claude Code's `EnterWorktree` — it creates worktrees in `.claude/worktrees/` which Pentagon doesn't manage
-- Add a MEMORY.md hard rule: "Use Pentagon worktree management only — never raw git worktree commands"
 
-**Detection:** Run `git worktree list` and compare with Pentagon's canvas. Any worktrees not visible on the canvas are orphaned.
+**Detection:** Agent references files in unexpected directories. Check the agent's `pwd` against its expected working directory in ORGANIZATION.md.
 
 ---
 
@@ -338,7 +338,7 @@ When I complete a task, I MUST:
 | Subagent task leakage | Clean up subagent tasks | Task management |
 | Directory staleness | Re-read directory.json before sending | Messaging discipline |
 | Cross-provider corruption | /clear to sanitize session | Agent workflow |
-| Bypassing worktree mgmt | Use Pentagon spawn/skill only | MEMORY.md hard rule |
+| Bypassing isolation/worktree mgmt | Use isolation mode (v1.3+) or Pentagon spawn (v1.2) | Settings + MEMORY.md |
 
 ---
 

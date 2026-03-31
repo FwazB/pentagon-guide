@@ -12,7 +12,7 @@ For Pentagon projects, a good CLAUDE.md captures: coding conventions, terminolog
 
 ### Community Guide — Not Official Documentation
 
-This guide is **not affiliated with Dark Research or Pentagon**. We are community authors documenting patterns from hands-on experience.
+This guide is **not affiliated with Arlington Labs or Pentagon**. We are community authors documenting patterns from hands-on experience.
 
 **Never use language that implies insider access:**
 - "being investigated," "the team is fixing," "we're developing," "we're working on"
@@ -45,14 +45,12 @@ This guide is **not affiliated with Dark Research or Pentagon**. We are communit
 | `02-communication.md` | Communication | Foundations |
 | `03-hierarchy-design.md` | Hierarchy Design | Foundations |
 | `04-lifecycle.md` | Agent Lifecycle | Operations |
-| `04b-a2a-communication.md` | A2A Communication | Operations |
 | `05-auditor-pattern.md` | The Auditor Pattern | Operations |
 | `06-report-discipline.md` | Report Discipline | Operations |
 | `07-skills-and-tools.md` | Skills and Tools | Advanced |
 | `08-common-pitfalls.md` | Common Pitfalls | Advanced |
 | `09-operational-playbook.md` | Operational Playbook | Advanced |
 | `10-troubleshooting.md` | Troubleshooting | Reference |
-| `11-beta.md` | The v1.3 Beta | Reference |
 | `CLAUDE.md` | CLAUDE.md Example | Reference |
 | `SUMMARY.md` | GitBook navigation | — |
 
@@ -86,6 +84,7 @@ Use these version notes when writing about features or fixes. Always cite the ve
 | v1.3.0-beta.20 | ~30 stability PRs; agents stopping randomly addressed; agent action visibility in DMs |
 | v1.3.0-beta.21 | Message queueing (multi-message auto-sequencing); nearing stable graduation |
 | v1.3.0-beta.25 | Agent persistence; communication stability; UI reconnection monitoring after sleep; channel-based A2A; isolation refinements |
+| v1.3.4 | Stable graduation from beta; all beta features (channels, isolation, persistence, message queueing) ship as stable; approval gates; multi-folder workspaces |
 
 ### Terminology
 
@@ -99,6 +98,9 @@ Use these version notes when writing about features or fixes. Always cite the ve
 | **Injection** | How Pentagon delivers messages into an agent's Claude Code conversation via TUI stdin. |
 | **Isolation** | v1.3 opt-in setting replacing worktrees — gives each agent a full independent repo clone. Off by default. |
 | **Channel** | v1.3 slack-like conversation space for agent communication, replacing inbox-based file messaging. |
+| **Approval gate** | v1.3 guardrail allowing agents to flag decisions requiring human sign-off before proceeding. |
+| **Multi-folder workspace** | v1.3 map-level feature — a single map supports agents working across entire project structures, not just one directory. |
+| **MCP tools** | Pentagon's server-side tools (`send_message`, `find_conversation`, `read_messages`, `patch_document`, etc.) available to agents via the Model Context Protocol. Primary communication method on v1.3+. |
 
 **Note:** The `workspace` field still appears in Pentagon's JSON files (`directory.json`, spawn requests). This is the actual field name in the data — don't rename it in code examples or JSON samples. Only update the prose term.
 
@@ -106,24 +108,14 @@ Use these version notes when writing about features or fixes. Always cite the ve
 
 ### How This Guide Is Maintained
 
-This guide is maintained by two Pentagon agents working in parallel — a pattern you can replicate for any documentation project:
+This guide is maintained by two Pentagon agents:
 
-1. **Director agent** plans changes, handles conceptual rewrites, reviews editor work, commits, and pushes
-2. **Editor agent** handles mechanical edits (search-and-replace, auditing, verification) and reports back
-3. **Editor works in a separate git worktree** — changes are merged into the main repo before committing
-4. **All edits are cross-referenced** — editor reports what changed; director reviews before finalizing
+1. **Writer agent** plans changes, writes chapters, handles rewrites, commits, and pushes
+2. **Verification-editor agent** independently fact-checks claims, audits voice rule compliance, and flags issues
 
-This is a practical example of the manager-worker pattern from [Chapter 3](03-hierarchy-design.md), adapted for documentation work.
+The writer drafts content and sends it to the verification-editor for review before presenting to the human. The verification-editor checks every behavioral claim against version citations, audits for temporal language and marketing copy, verifies cross-references, and confirms structural compliance with this CLAUDE.md.
 
-### Worktree Merge Process
-
-When agents work in separate worktrees, merge changes with:
-
-```bash
-cd {editor-worktree} && git diff {files} | (cd {main-repo} && git apply -)
-```
-
-Replace `{editor-worktree}` with the editor's worktree path and `{main-repo}` with your local clone. See [Chapter 4 — Git Worktree Isolation](04-lifecycle.md#git-worktree-isolation) for more on Pentagon's worktree model.
+This is a practical example of the auditor-patcher pattern from [Chapter 9](09-operational-playbook.md), adapted for documentation work.
 
 ### Git Conventions
 

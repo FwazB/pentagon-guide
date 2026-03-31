@@ -2,7 +2,42 @@
 
 > *A skill is a slash command that gives an agent a new capability without rewriting its soul. Drop a folder in the right directory and every agent on the team gets the power.*
 
-Pentagon agents run on Claude Code, which means they inherit all of Claude Code's tool capabilities — file I/O, Bash, search, web access, and more. Pentagon adds a layer on top: **skills** (custom slash commands) and **hooks** (lifecycle event scripts) that extend what agents can do and how they integrate with Pentagon's monitoring.
+Pentagon agents run on Claude Code, which means they inherit all of Claude Code's tool capabilities — file I/O, Bash, search, web access, and more. Pentagon adds layers on top: **skills** (custom slash commands), **MCP tools** (server-side capabilities via the Model Context Protocol), **hooks** (lifecycle event scripts), and **approval gates** (human sign-off guardrails).
+
+---
+
+## MCP Tools
+
+### What Are MCP Tools?
+
+Pentagon exposes server-side capabilities to agents via the Model Context Protocol (MCP). These tools are available to every agent without any installation — they're provided by the Pentagon server.
+
+### Core MCP Tools
+
+| Tool | Purpose |
+|------|---------|
+| `send_message` | Send a message to a conversation or channel |
+| `find_conversation` | Find or create a conversation with specific participants |
+| `read_messages` | Read messages from a conversation |
+| `patch_document` | Update agent documents (report, memory, soul, purpose) |
+| `read_document` | Read an agent's documents |
+| `read_tasks` | Read an agent's task list |
+| `write_tasks` | Update an agent's task list |
+| `get_org_context` | Get organizational context — teams, teammates, map info |
+| `spawn_agent` | Programmatically spawn a new agent |
+| `token_info` | Check token/usage information |
+
+### MCP Tools vs. Skills
+
+| | MCP Tools | Skills |
+|---|---|---|
+| **Source** | Pentagon server | Filesystem (SKILL.md files) |
+| **Installation** | Automatic — available to all agents | Manual — drop into skills directory |
+| **Invocation** | Called directly as tools | Invoked via `/skill-name` slash command |
+| **Capability** | Communication, document management, spawning | Custom workflows, deployment, reviews |
+| **Customizable** | No — Pentagon defines them | Yes — you write them |
+
+MCP tools handle Pentagon-native operations (messaging, documents, spawning). Skills handle custom project-specific workflows.
 
 ---
 
@@ -43,22 +78,18 @@ for agent_dir in ~/.pentagon/agents/*/; do
 done
 ```
 
-⚠️ **Bash variable expansion gotcha:** In zsh, `${AGENTS[$i]}` may not work as expected. Use simple `for` loops over glob patterns instead.
-
 ### Built-In Pentagon Skills
 
 Pentagon ships with several built-in skills:
 
 | Skill | Purpose |
 |-------|---------|
-| `/send-pentagon-message` | Send messages to other agents |
 | `/manage-pentagon-agent` | Spawn and configure agents |
 | `/manage-pentagon-team` | Create and manage teams |
 | `/manage-pentagon-canvas` | Arrange agents on the canvas |
 | `/manage-pentagon-role` | Create organizational roles |
-| `/manage-pentagon-worktree` | Create and manage git worktrees |
 
-These are the backbone of multi-agent coordination. `/send-pentagon-message` in particular is the primary communication mechanism (see [Chapter 2](02-communication.md)). It uses the Write tool natively for delivery, which reduces token usage and simplifies the message delivery path.
+On v1.3+, communication skills (`/send-pentagon-message`) are superseded by MCP tools (`send_message`, `find_conversation`). The MCP tools are the recommended communication path.
 
 ### Writing Custom Skills
 
@@ -82,7 +113,7 @@ Deploy the current branch to the staging environment.
 2. If tests pass, build: `npm run build`
 3. Deploy using: `npm run deploy:${environment}`
 4. Verify deployment: `curl https://${environment}.example.com/health`
-5. Report result to the deploying manager via /send-pentagon-message
+5. Report result to the deploying manager via send_message
 
 ## Examples
 /deploy staging
@@ -99,6 +130,22 @@ Deploy the current branch to the staging environment.
 ### Skills and Git
 
 Pentagon-injected skills (symlinked into your agent's skill directory) are excluded from git tracking. They won't appear in your agent's PRs or branches. This means you can install skills freely without polluting the project's version control.
+
+---
+
+## Approval Gates
+
+v1.3 introduces **approval gates** — guardrails that allow agents to flag decisions requiring human authorization before proceeding.
+
+When an agent reaches a decision point covered by a gate, it pauses and requests human sign-off before proceeding. Configuration details may vary — consult Pentagon's documentation for current setup options.
+
+**Use cases:**
+- Production deployments
+- Destructive operations (database migrations, branch deletions)
+- External communications (sending emails, posting to services)
+- Cost-sensitive operations (large API calls, cloud resource provisioning)
+
+Approval gates complement the patterns in [Chapter 9 — Operational Playbook](09-operational-playbook.md) where human-in-the-loop is recommended for irreversible actions. Gates formalize this — instead of relying on SOUL.md instructions to "ask before pushing," the gate enforces it at the system level.
 
 ---
 
@@ -144,10 +191,6 @@ You don't need to manage status tracking — it's handled automatically by Penta
 
 The scope guard is auto-generated and auto-managed. You don't need to edit it. If an agent's file operations are being unexpectedly blocked, check that `PENTAGON_AGENT_ID` and `PENTAGON_BASE` environment variables are set correctly in the agent's session.
 
-### What's Ahead: Agent Sandboxes
-
-Pentagon's public roadmap includes **agent sandboxes** — local process isolation that would go beyond file-level scope guards. This would complement (and may eventually replace parts of) the current scope guard system.
-
 ---
 
 ## Tool Usage Patterns
@@ -158,25 +201,26 @@ Claude Code provides a rich set of tools. Here's how they interact with Pentagon
 
 | Tool | Use For | Pentagon Relevance |
 |------|---------|-------------------|
-| **Read** | Reading files | Reading other agents' reports, inboxes, configs |
-| **Write** | Creating/overwriting files | Writing to agent inboxes (message delivery) |
+| **Read** | Reading files | Reading other agents' reports, configs |
+| **Write** | Creating/overwriting files | Writing to agent inboxes (legacy message delivery) |
 | **Edit** | Modifying files | Updating SOUL.md, MEMORY.md, PURPOSE.md, tasks.json |
-| **Glob** | Finding files by pattern | Scanning inbox directories |
+| **Glob** | Finding files by pattern | Scanning agent directories |
 | **Grep** | Searching file contents | Finding references to UUIDs, agent names |
 
-### The Write Tool for Cross-Agent Operations
+### MCP Tools for Cross-Agent Operations
 
-The Write tool is the **only** tool that can deliver messages to other agent inboxes. The scope guard blocks Edit (messages are immutable) and Bash redirects to agent directories.
+On v1.3+, use MCP tools for all cross-agent communication:
 
-Use Write for:
-- Delivering messages to other agent inboxes (the only allowed method)
-- Creating files in your own agent directory
+- `send_message` — Send messages to conversations/channels
+- `find_conversation` — Look up or create conversation with participants
+- `read_messages` — Read conversation history
+- `patch_document` — Update your own report, memory, soul, or purpose
 
-**Important:** You can no longer use Write to modify other agents' identity files (SOUL.md, MEMORY.md, etc.). The scope guard blocks all cross-agent writes except inbox delivery. To update another agent's files after a respawn, the human must do it directly or through the agent's own session.
+The Write tool remains valid for inbox delivery (v1.2 legacy), but MCP tools are the recommended path.
 
 ### The Bash Tool: Use Carefully
 
-Bash is powerful but has scope guard constraints:
+The Bash tool has scope guard constraints:
 
 - **Redirects and file operations** (`>`, `>>`, `tee`, `cp`, `mv`) targeting other agent directories are blocked
 - The scope guard scans Bash commands heuristically — it catches common patterns but not obfuscated ones
@@ -197,11 +241,22 @@ Claude Code's Task tool spawns subagents for parallel research or exploration. I
 
 ### The Agent's Working Directory
 
-Each agent is assigned a project directory at spawn time. This is where it operates — reading code, writing files, running commands. Pentagon sets this via the config at spawn.
+Each agent is assigned a project directory at spawn time. This is where it operates — reading code, writing files, running commands. Pentagon sets this via the config at spawn. v1.3+ supports multi-folder workspaces, allowing agents to work across entire project structures.
 
-### Git Worktree Isolation
+### Isolation Mode (v1.3+)
 
-Agents on the same repo get isolated worktrees. Pentagon manages these outside the repo:
+When isolation is enabled, each agent gets a fully independent clone of its repositories:
+
+```
+Agent A → /path/to/clone-a/  (independent git repo)
+Agent B → /path/to/clone-b/  (independent git repo)
+```
+
+Agents interact with their clones like human engineers on a team — branching, committing, pushing, pulling through standard git.
+
+### Legacy: Git Worktree Isolation (v1.2)
+
+On v1.2, agents on the same repo got isolated worktrees managed by Pentagon:
 
 ```
 ~/.pentagon/worktrees/
@@ -210,11 +265,11 @@ Agents on the same repo get isolated worktrees. Pentagon manages these outside t
     └── feature-ui/      ← Agent 2's isolated copy
 ```
 
-Pentagon intercepts git commands via a wrapper at `~/.pentagon/bin/git`. This wrapper ensures that worktree operations, branch switching, and cleanup are all managed by Pentagon. Never use `git worktree add` directly or Claude Code's `EnterWorktree` — these bypass Pentagon's tracking and create orphaned worktrees.
+Pentagon intercepted git commands via a wrapper at `~/.pentagon/bin/git`. On v1.3+, use isolation mode instead.
 
 ### Pentagon Directory Access
 
-All agents can access `~/.pentagon/` for identity files, inboxes, and coordination. This directory is outside git and shared across all agents:
+All agents can access `~/.pentagon/` for identity files and coordination. This directory is outside git and shared across all agents:
 
 ```
 ~/.pentagon/
@@ -224,7 +279,6 @@ All agents can access `~/.pentagon/` for identity files, inboxes, and coordinati
 ├── hooks/               ← Scope guard hook
 ├── sessions/{uuid}/     ← Conversation transcripts
 ├── workspaces/{uuid}/   ← Map configurations
-├── roles/               ← Organizational role definitions
 ├── a2a-audit.jsonl      ← Agent-to-agent audit log
 ├── perf-log.jsonl       ← Performance metrics (CPU, I/O, timing)
 └── canvas-layout.json   ← Persistent canvas state
@@ -246,14 +300,15 @@ This is effective for preventing accidental cross-contamination — agents stepp
 
 **Read access is unrestricted.** Any agent can read any other agent's files — MEMORY.md, tasks.json, report.json, inbox messages, everything. In practice, agents need this for coordination (auditors read reports, managers read task boards). But it means agent knowledge is shared knowledge. Never store actual secrets — API keys, tokens, credentials — in agent files. Use environment variables for secrets.
 
-**Message provenance is hook-validated, not cryptographically signed.** The scope guard validates that `from.id` matches the sender's `PENTAGON_AGENT_ID` environment variable. This catches casual spoofing but isn't cryptographic verification. For high-stakes decisions (deploy approvals, access grants), verify through a second channel or require human confirmation.
+**Message provenance is hook-validated, not cryptographically signed.** The scope guard validates that `from.id` matches the sender's `PENTAGON_AGENT_ID` environment variable. This catches casual spoofing but isn't cryptographic verification. For high-stakes decisions (deploy approvals, access grants), use approval gates or require human confirmation.
 
-**Messages are read by an LLM.** Agent-to-agent messages become part of the receiving agent's context. A crafted message could contain instructions disguised as content — the same class of risk as prompt injection from any untrusted input. For critical actions, require explicit human approval rather than relying solely on peer agent authorization.
+**Messages are read by an LLM.** Agent-to-agent messages become part of the receiving agent's context. A crafted message could contain instructions disguised as content — the same class of risk as prompt injection from any untrusted input. For critical actions, require explicit human approval via approval gates rather than relying solely on peer agent authorization.
 
 ### Security Patterns That Work
 
 | Pattern | Why It Helps |
 |---------|-------------|
+| **Approval gates** | System-enforced human sign-off for destructive or sensitive operations |
 | **Read-only auditors** | Auditors that can't take destructive actions are safer recipients of untrusted input |
 | **Separation of audit and execution** | The agent that finds issues shouldn't be the same agent that fixes them |
 | **Multi-agent approval chains** | Production pushes require approval from both a security reviewer and a project lead |
@@ -268,14 +323,14 @@ Agents performing security or quality audits need the project's design philosoph
 
 ## Key Takeaways
 
-1. **Skills are drop-in capabilities.** Install a folder with a SKILL.md and the agent gets a new slash command.
-2. **The scope guard enforces file isolation.** Agents can't write to each other's directories — only inbox delivery via Write is allowed.
-3. **Use Write for inbox delivery.** It's the only tool that passes scope guard validation for cross-agent messaging.
-4. **Skills don't pollute git.** Pentagon-injected skills are excluded from version control.
-5. **Batch-install skills with simple loops.** One script can equip your entire team.
+1. **MCP tools are the primary interface for cross-agent operations on v1.3+.** `send_message`, `find_conversation`, `patch_document` — use these over filesystem-based approaches.
+2. **Skills are drop-in capabilities.** Install a folder with a SKILL.md and the agent gets a new slash command.
+3. **Approval gates enforce human sign-off at the system level.** Use them for production deployments, destructive operations, and anything irreversible.
+4. **The scope guard enforces file isolation.** Agents can't write to each other's directories — only inbox delivery via Write is allowed.
+5. **Skills don't pollute git.** Pentagon-injected skills are excluded from version control.
 6. **Prefer dedicated tools over Bash.** Read, Write, Edit, Glob, Grep are more reliable and have better scope guard compatibility.
 7. **Never store secrets in agent files.** All agents can read all files. Use environment variables.
-8. **Require human confirmation for irreversible actions.** Agent-to-agent trust is not sufficient for production operations.
+8. **Require human confirmation for irreversible actions.** Approval gates or manual sign-off — agent-to-agent trust alone is not sufficient for production operations.
 
 ---
 

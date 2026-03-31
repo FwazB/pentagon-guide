@@ -4,7 +4,7 @@
 
 Chapter 8 covers pitfalls — preventive patterns you apply *before* things go wrong. This chapter is for when things already went wrong. It's organized by symptom: you see the error, you find it here, you fix it.
 
-> **Pentagon version note:** This chapter was last updated against Pentagon v1.2.15. Performance optimizations in v1.2.5+ support 50+ agents on 16GB RAM without beach balls, and v1.2.6+ loads 100+ agents in realtime on app open. If you're on an older version, some issues described here may already be fixed — keep Pentagon updated.
+> **Pentagon version note:** This chapter was last updated against Pentagon v1.3.4 stable. Performance optimizations support 50+ agents on 16GB RAM, and 100+ agents load in realtime on app open. If you're on an older version, some issues described here may already be fixed — keep Pentagon updated.
 
 ---
 
@@ -142,7 +142,7 @@ The agent hit the crash cap after repeated failures.
 
 ## Messages Not Delivering
 
-**Symptoms:** An agent sends a message via `/send-pentagon-message` but the recipient never receives it. Or: the sender's terminal shows success but the recipient's inbox is empty.
+**Symptoms:** An agent sends a message but the recipient never receives it. Or: the sender's terminal shows success but the message doesn't appear in the recipient's conversation.
 
 ### Same-Map Delivery Failure
 
@@ -168,7 +168,7 @@ After a laptop sleep/wake cycle, A2A messaging can fail to reconnect properly.
 2. Re-send any messages that were sent during the sleep/wake window
 3. Pentagon's injection verification retries automatically, but manual restart resolves persistent issues
 
-**Improved in v1.2.8:** Pentagon programmatically verifies message injection and retries on failure (30s retry window). Startup message flurry is also prevented — delivery is staggered when agents wake with pending messages. Post-sleep reliability is significantly better on v1.2.8+.
+**Improved in v1.2.8:** Pentagon programmatically verifies message injection and retries on failure (30s retry window). Startup message flurry is also prevented — delivery is staggered when agents wake with pending messages. v1.2.8+ adds automatic retry and staggered delivery, reducing post-sleep message loss.
 
 ---
 
@@ -236,20 +236,20 @@ A related but distinct scenario: the replacement agent has an **empty** MEMORY.m
 
 ---
 
-## Worktree Path Confusion
+## Working Directory Confusion
 
 **Symptoms:** Agent can't find expected files. Build commands fail with "file not found." Agent thinks it's in the wrong directory.
 
-**Cause:** Pentagon stores worktrees at `~/.pentagon/worktrees/{repo}-{hash}/{branch}/`, not in the project directory. If an agent was spawned into a worktree, its working directory is different from the main repo.
+**Cause (v1.3+ with isolation):** Each agent's clone is in a separate directory. If the agent's working directory doesn't match its expected clone path, something went wrong during isolation setup.
+
+**Cause (v1.2 worktrees):** Pentagon stores worktrees at `~/.pentagon/worktrees/{repo}-{hash}/{branch}/`, not in the project directory. If an agent was spawned into a worktree, its working directory is different from the main repo.
 
 **Fix:**
 1. Check the agent's actual working directory: `pwd` in the terminal
 2. Verify the agent's map path in ORGANIZATION.md
 3. If the path is wrong, the agent may have been spawned with incorrect config — respawn with the correct directory
 
-**Common gotcha:** An agent using `git worktree add` directly (bypassing Pentagon) creates worktrees in a different location that Pentagon doesn't track. Always use Pentagon's spawn flow or `/manage-pentagon-worktree`.
-
-**Branch switching (v1.2.9+):** Switching branches or worktrees no longer kills the agent. Pentagon uses `--resume` under the hood to continue the agent's session after the switch — it should feel seamless. Use `/manage-pentagon-worktree` or tell the agent to switch branches; it knows the right way to handle it.
+**Common gotcha:** An agent using `git worktree add` directly (bypassing Pentagon) creates worktrees in a location Pentagon doesn't track. On v1.3+, use isolation mode instead of manual worktrees.
 
 ---
 
@@ -302,7 +302,7 @@ A related but distinct scenario: the replacement agent has an **empty** MEMORY.m
 - If an agent starts logging duplicate acknowledgments, intervene quickly with `/clear` before it burns too much context
 - Agents can add a MEMORY.md note: "If I see the same message injected multiple times, acknowledge once and ignore subsequent duplicates"
 
-**Status:** Partially addressed as of v1.2.15. v1.2.8 fixed the startup flurry variant and added programmatic injection verification with auto-retry. If you see duplicates mid-session (not on startup), that variant has not been fixed yet — `/clear` or respawn resolves it. Keep Pentagon updated.
+**Status:** On v1.3+, channel-based communication bypasses the TUI injection path entirely, which eliminates this class of bugs. If you're still using inbox-based messaging on v1.3 and see duplicates mid-session, `/clear` or respawn resolves it. On v1.2, the startup flurry variant was fixed in v1.2.8; the mid-session variant was partially addressed in v1.2.15.
 
 ---
 
@@ -327,9 +327,11 @@ A related but distinct scenario: the replacement agent has an **empty** MEMORY.m
 
 **Symptoms:** You quit Pentagon and reopen it. Your entire team of agents is gone — the canvas is empty or shows a fresh map. But your agent data is still on disk at `~/.pentagon/agents/`.
 
-**Cause:** When Pentagon restarts, it may delete the old map and create a new one with a new map ID. Existing agents still reference the old map ID in their configuration, so they become invisible to the app — even though all their data (SOUL.md, MEMORY.md, tasks, inbox) is intact on disk.
+**Cause:** On v1.2 and early v1.3 beta builds, when Pentagon restarts it may delete the old map and create a new one with a new map ID. Existing agents still reference the old map ID in their configuration, so they become invisible to the app — even though all their data is intact on disk.
 
-**Fix:**
+**Status on v1.3.4:** Agent persistence is resolved as of v1.3.0-beta.25. Agents survive application restarts. If you're on v1.3.4 stable and still seeing this issue, file a bug report.
+
+**Fix (v1.2 / early beta):**
 1. Don't panic — your agent data is safe. Nothing was deleted.
 2. Update the `mapId` and `sourceId` fields in each agent's `config.json` to match the newly created map's ID
 3. Copy the desk positions from the old map's layout into the new map's `canvas-layout.json`
@@ -338,9 +340,8 @@ A related but distinct scenario: the replacement agent has an **empty** MEMORY.m
 **Finding the new map ID:** Open Pentagon after the restart — it creates a fresh map visible in the map picker. The new map's ID is in its configuration files under `~/.pentagon/`.
 
 **Prevention:**
-- This is a known edge case with Pentagon restarts — community members have reported it
-- Keep backups of your `~/.pentagon/` directory if you're running large teams
-- If it happens, the fix is mechanical — no data is lost, only the map-to-agent references need updating
+- Upgrade to v1.3.4 stable — this issue is resolved
+- On older versions: keep backups of your `~/.pentagon/` directory if you're running large teams
 
 ---
 
@@ -355,8 +356,9 @@ When something goes wrong and you're not sure where to start:
 | Agent terminal | Click the desk to open | Error messages, crash output |
 | tasks.json | Read the file | What the agent thinks it should be doing |
 | MEMORY.md | Read the file | How much context survived the crash |
-| Inbox | `ls ~/.pentagon/agents/{uuid}/inbox/` | Unprocessed messages waiting |
-| Quarantine | `ls ~/.pentagon/agents/{uuid}/inbox-quarantine/` | Failed deliveries |
+| Conversations | `read_messages` MCP tool (v1.3+) | Recent message activity |
+| Inbox (legacy) | `ls ~/.pentagon/agents/{uuid}/inbox/` | Unprocessed messages waiting |
+| Quarantine (legacy) | `ls ~/.pentagon/agents/{uuid}/inbox-quarantine/` | Failed deliveries |
 | Session history | Check `~/.pentagon/sessions/{uuid}/` | What happened before the crash |
 | Delivery receipts | Check `delivery-receipts.jsonl` | Whether messages were actually sent |
 

@@ -42,9 +42,9 @@ The auditor's independence is what makes it effective. It can't audit the hierar
 
 The primary function. Periodically:
 
-- **Scan all agent inboxes** — List files in each `~/.pentagon/agents/{uuid}/inbox/`
+- **Check conversation activity** — Use `read_messages` to verify message flow between agents, or scan inbox directories (`~/.pentagon/agents/{uuid}/inbox/`) for legacy message delivery
 - **Read all report.json files** — What does each agent claim to be doing?
-- **Cross-reference claims vs. evidence** — If a manager says "dispatched 5 tasks" but worker inboxes are empty, that's a gap
+- **Cross-reference claims vs. evidence** — If a manager says "dispatched 5 tasks" but no messages appear in worker conversations, that's a gap
 
 ### 2. Idle Detection
 
@@ -98,7 +98,7 @@ failures. Report ONLY to the human.
 
 ## Communication Rule
 Every decision that affects another agent MUST be sent via
-/send-pentagon-message.
+Pentagon's messaging tools.
 ```
 
 ### tasks.json
@@ -137,15 +137,14 @@ For each agent:
   If report is empty or stale → FLAG
 ```
 
-### Step 3: Scan Inboxes and Outboxes
+### Step 3: Scan Message Flow
 
 ```
 For each agent:
-  List {agent-inbox}/*.json — incoming messages
-  List {agent-dir}/inbox-sent/*.json — outgoing messages (sent copies)
-  Count unread messages
-  Cross-reference: do dispatch claims match actual inbox contents?
-  Cross-reference: do sent copies in inbox-sent/ match messages in recipient inboxes?
+  Use read_messages to check conversation activity (v1.3+)
+  Or list {agent-inbox}/*.json — incoming messages (legacy)
+  Or list {agent-dir}/inbox-sent/*.json — outgoing messages (legacy)
+  Cross-reference: do dispatch claims match actual messages sent?
 ```
 
 ### Step 4: Bridge Gaps

@@ -1,6 +1,6 @@
 # Agent Identity — The Files That Make or Break Your Agents
 
-> *The difference between an agent that picks up where it left off and one that starts from zero every session? Six well-written files.*
+> *The difference between an agent that picks up where it left off and one that starts from zero every session? Five well-written files.*
 
 Every Pentagon agent lives in `~/.pentagon/agents/{uuid}/`. Inside that directory is a set of identity files that define who the agent is, what it knows, what it's working toward, what it's working on, and what it's doing right now. These files are the foundation of everything — resilience, auditability, handoffs, and respawns all depend on them.
 
@@ -68,7 +68,7 @@ Verify deliveries. Coordinate across the team.
 
 ## Communication Rule
 Every decision that affects another agent MUST be sent via
-/send-pentagon-message. report.json is for human visibility only —
+Pentagon's messaging tools. report.json is for human visibility only —
 other agents cannot read it.
 ```
 
@@ -361,7 +361,7 @@ A machine-readable contact list of agents visible to the current agent. Each ent
 ]
 ```
 
-Agents use directory.json to look up recipients when sending messages. The `inbox` path tells them exactly where to deliver.
+Agents use directory.json to look up recipients when sending messages. On v1.3+, channels and MCP tools (`send_message`, `find_conversation`) are the primary communication method, but the `inbox` field remains in the contact card for legacy compatibility.
 
 ---
 
@@ -399,7 +399,7 @@ Conversation transcripts are automatically preserved at `~/.pentagon/sessions/{u
 
 ---
 
-## Putting It Together
+## Key Takeaways
 
 When you spawn an agent, think of the identity stack as a pre-flight checklist:
 

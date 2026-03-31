@@ -11,7 +11,6 @@
 ## Operations
 
 * [Agent Lifecycle](04-lifecycle.md)
-* [A2A Communication](04b-a2a-communication.md)
 * [The Auditor Pattern](05-auditor-pattern.md)
 * [Report Discipline](06-report-discipline.md)
 
@@ -24,5 +23,4 @@
 ## Reference
 
 * [Troubleshooting](10-troubleshooting.md)
-* [The v1.3 Beta](11-beta.md)
 * [CLAUDE.md Example](CLAUDE.md)

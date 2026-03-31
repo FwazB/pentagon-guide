@@ -45,7 +45,7 @@ Each worker gets:
 
 **6. Verify the chain**
 
-Have the lead send a test message to each manager. Have each manager send a test to their workers. Confirm delivery by checking inboxes.
+Have the lead send a test message to each manager. Have each manager send a test to their workers. Confirm delivery by checking conversations (v1.3+ MCP tools) or inboxes (legacy).
 
 **7. Spawn the auditor**
 
@@ -197,7 +197,7 @@ You have a hard problem and want two agents to try different approaches in paral
 
 ### Steps
 
-**1. Spawn two worker agents** on the same repo. Pentagon gives each its own worktree.
+**1. Spawn two worker agents** on the same repo. With isolation mode enabled (v1.3+), each gets its own independent clone. On v1.2, each gets its own worktree.
 
 **2. Give them different SOUL.md instructions:**
 
@@ -217,13 +217,13 @@ Focus on interactivity and transition smoothness.
 
 **3. Give them the same tasks.json** — identical requirements.
 
-**4. Let them work independently.** Each is in its own worktree, no conflicts.
+**4. Let them work independently.** Each is in its own isolated environment, no conflicts.
 
 **5. Compare results.** Review both implementations. Merge the winner, discard the other.
 
-**6. Clean up** — Terminate the losing agent and delete its worktree.
+**6. Clean up** — Terminate the losing agent.
 
-**Tip: Sequential branch work doesn't need separate agents.** Pentagon supports seamless branch switching mid-session — an agent's working directory updates via `--resume` without killing the process. If your exploration is sequential (try approach A, then try approach B), a single agent can switch branches and keep working. Use the A/B pattern when you want **parallel** exploration — both approaches running simultaneously.
+**Tip: Sequential branch work doesn't need separate agents.** If your exploration is sequential (try approach A, then try approach B), a single agent can switch branches and keep working. Use the A/B pattern when you want **parallel** exploration — both approaches running simultaneously.
 
 ---
 
@@ -425,7 +425,7 @@ Code auditor. Read-only. Review the codebase for issues.
 - NEVER modify code files
 - NEVER push to any branch
 - Write findings to structured reports
-- Send fix lists to the Patcher via /send-pentagon-message
+- Send fix lists to the Patcher via Pentagon's messaging tools
 
 ## Domain Context
 [Include the project's design philosophy here — architecture patterns,

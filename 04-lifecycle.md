@@ -47,22 +47,22 @@ Pentagon's StatusEngine manages transitions deterministically. The same state + 
 
 1. Click an empty grid cell (or use keyboard shortcuts)
 2. **Select a map** (required — every agent must belong to a map, and this can't be changed later)
-3. Select a project directory
+3. Select a project directory (v1.3+ supports multi-folder workspaces — agents can work across entire project structures)
 4. Name the agent
 5. Pick a model (Opus, Sonnet, or Haiku — multi-provider support is available, starting with Kimi)
 6. Set permissions (Full Auto or Custom)
-7. Choose branch strategy (existing branch or new worktree)
+7. Choose isolation mode (on or off — see Isolation Mode below)
 8. Click Create
 
 The agent materializes as a desk on the canvas. You can also spawn sub-agents from existing agents via the canvas context menu.
 
 ### Cloning
 
-Click the **+** indicator on adjacent empty cells to clone an existing agent. The clone gets its own git worktree (isolated branch) while inheriting the original's identity files. This is the fastest way to parallelize work on the same repo.
+Click the **+** indicator on adjacent empty cells to clone an existing agent. The clone gets its own isolated environment while inheriting the original's identity files. This is the fastest way to parallelize work on the same repo.
 
-### Spawning via Skill
+### Spawning via Skill or MCP Tool
 
-The `/manage-pentagon-agent` skill allows programmatic agent creation — useful when a manager agent needs to spawn workers.
+The `/manage-pentagon-agent` skill and the `spawn_agent` MCP tool allow programmatic agent creation — useful when a manager agent needs to spawn workers.
 
 ### The initialMessage Power Move
 
@@ -78,7 +78,7 @@ Welcome! You are a testing agent. Please get oriented.
 You are a testing agent. Your FIRST actions:
 1. Read tasks.json for your current assignments
 2. Run the test suite in apps/api/ to establish a baseline
-3. Report results to FeatureManager <UUID> via /send-pentagon-message
+3. Report results to FeatureManager <UUID> via send_message
 Start immediately.
 ```
 
@@ -86,37 +86,48 @@ The strong version eliminates the "orientation phase" where a fresh agent spends
 
 ---
 
-## Git Worktree Isolation
+## Isolation Mode
 
-Pentagon uses git worktrees to prevent agents from stepping on each other's code:
+Pentagon v1.3 replaces the v1.2 git worktree model with **isolation mode** — an opt-in setting that gives each agent a completely independent clone of every repository it works with.
 
-- The **first agent** on a repo works on the existing branch
-- **Every subsequent agent** gets its own worktree at `~/.pentagon/worktrees/{repo}-{hash}/{branch}/`
+### How It Works
 
-This means two agents can work on the same repository simultaneously without merge conflicts. Each agent sees its own working copy.
+| | Worktrees (v1.2) | Isolation (v1.3+) |
+|---|---|---|
+| **Mechanism** | Git worktrees sharing a single `.git` directory | Full independent clones |
+| **Default** | On (automatic for second+ agents) | Off (enable in settings) |
+| **Flexibility** | Limited — worktree branches linked to parent repo | Full — each clone behaves as a standalone repo |
+| **Interaction model** | Pentagon's git wrapper manages lifecycle | Agent interacts with its repo like a human engineer on a team |
 
-### Pentagon Manages Worktrees — Don't Bypass It
+**Enabling isolation:** Toggle it on in Pentagon's settings. Each agent then operates on its own clone with full git capabilities — branching, stashing, rebasing — without risk of conflicts with other agents.
 
-Pentagon intercepts git commands via a wrapper at `~/.pentagon/bin/git`. This wrapper handles worktree creation, branch management, and cleanup automatically.
+### Impact on Workflows
 
-**Do NOT use:**
-- `git worktree add` directly — Pentagon won't track the worktree
-- Claude Code's `EnterWorktree` — It creates worktrees in `.claude/worktrees/` which Pentagon doesn't manage
+- Agents with isolation enabled push and pull through git like any team member — no worktree-specific merge process needed
+- Each clone is fully independent: its own `node_modules`, build artifacts, git history
+- Agents can't see each other's uncommitted work (same as worktrees), but the merge strategy shifts from worktree-to-main to standard branch merging
+- Pentagon's git wrapper at `~/.pentagon/bin/git` may behave differently under isolation — verify commands before relying on them in automation
 
-Always use Pentagon's spawn flow or `/manage-pentagon-worktree` to create and manage worktrees. Bypassing Pentagon's git interception creates orphaned worktrees that don't show up in Pentagon's tracking and can cause path confusion.
+### Multi-Folder Workspaces
 
-### Worktree Implications
+v1.3 supports **multi-folder workspaces** — a single map can support agents working across entire project structures, not just a single directory. This eliminates the need to create separate maps for each subdirectory of a monorepo.
 
-- Changes are isolated until explicitly merged
-- Agents can't see each other's uncommitted work
-- The human (or a designated merge agent) handles integration
-- Each worktree has its own node_modules, build artifacts, etc.
+### Legacy: Git Worktree Isolation (v1.2)
+
+On v1.2, Pentagon used git worktrees to prevent agents from stepping on each other's code:
+
+- The **first agent** on a repo worked on the existing branch
+- **Every subsequent agent** got its own worktree at `~/.pentagon/worktrees/{repo}-{hash}/{branch}/`
+
+Pentagon intercepted git commands via a wrapper at `~/.pentagon/bin/git`. The `/manage-pentagon-worktree` skill managed worktree lifecycle.
+
+**If you're on v1.3+, use isolation mode instead.** Worktrees still function but isolation is the forward path.
 
 ---
 
 ## Heartbeat System
 
-The heartbeat controls what happens when an agent's session ends. This is one of Pentagon's most powerful features for long-running operations.
+The heartbeat controls what happens when an agent's session ends. This is critical for long-running operations.
 
 ### Modes
 
@@ -163,6 +174,14 @@ This is excellent for review bots, inbox processors, or any agent that needs to 
 
 ---
 
+## Agent Persistence
+
+On v1.2 stable and early v1.3 beta builds, agents could disappear from the map after quitting and reopening Pentagon (see [Chapter 10 — Troubleshooting](10-troubleshooting.md#agents-disappear-after-quitting-and-reopening-pentagon) for details on the map ID mismatch issue).
+
+v1.3.0-beta.25+ resolves this — agents persist across application restarts. This makes patterns that depend on agents surviving restarts more viable: Always On heartbeat, scheduled polling, [auditor loops](05-auditor-pattern.md). On v1.2, these patterns required workarounds for the disappearance problem. On v1.3, they work as designed.
+
+---
+
 ## Dormancy
 
 Dormancy is a user-initiated pause. The agent's session is suspended, but its identity files and state are preserved. Think of it as putting an agent to sleep.
@@ -205,19 +224,13 @@ Every Claude model has a finite context window. As an agent works — reading fi
 
 ### Using /clear as a Lighter Reset
 
-Claude Code's `/clear` command resets the agent's conversational context without a full respawn. Pentagon preserves session history through `/clear` — your agent's transcript continues uninterrupted. This is useful when an agent's context is getting heavy but you don't want the overhead of a full respawn (UUID change, identity re-read, etc.).
+Claude Code's `/clear` command resets the agent's conversational context without a full respawn. Pentagon preserves session history through `/clear` (v1.2.6+) — your agent's transcript continues uninterrupted. This is useful when an agent's context is getting heavy but you don't want the overhead of a full respawn (UUID change, identity re-read, etc.).
 
 `/clear` also fixes **cross-provider session corruption** — when running mixed-provider sessions (e.g., Anthropic + Kimi), the session context can become corrupted, causing 400 errors. A `/clear` sanitizes the session state and resolves this.
 
 **When to /clear vs. respawn:**
 - `/clear` — Agent is sluggish but functional, or hitting 400 errors from cross-provider corruption.
 - Respawn — Agent is degraded, hallucinating, or needs updated SOUL.md changes.
-
-### Seamless Branch Switching
-
-Pentagon supports seamless branch switching mid-session. When you switch an agent's branch via the Pentagon UI, the agent's working directory updates without killing the process — it uses `--resume` to maintain conversational context.
-
-This means you don't need separate agents for sequential work on different branches. A single agent can finish a feature branch, switch to another, and keep working — no respawn, no context loss.
 
 ### The Proactive Respawn
 
@@ -243,7 +256,7 @@ Respawning gives an agent a fresh context window while preserving its identity. 
 
 ### The UUID Problem
 
-When an agent is respawned, it may get a new UUID. Every other agent that references the old UUID in their SOUL.md hierarchy section now has a stale reference. Messages sent to the old UUID go nowhere.
+When an agent is respawned, it may get a new UUID. Every other agent that references the old UUID in their SOUL.md hierarchy section has a stale reference. Messages sent to the old UUID go nowhere.
 
 **After respawning, update all UUID references:**
 
@@ -275,7 +288,7 @@ For long-running operations that will exceed context windows:
 1. Monitor agent behavior for degradation signs
 2. When degradation starts, update MEMORY.md with current progress
 3. Respawn the agent
-4. The fresh agent reads MEMORY.md and continues seamlessly
+4. The fresh agent reads MEMORY.md and continues where the previous instance left off
 
 This keeps agents perpetually fresh. The cost is a brief pause during respawn.
 
@@ -298,12 +311,14 @@ When multiple agents have stale context, conflicting task boards, or broken UUID
 ## Key Takeaways
 
 1. **Heartbeat keeps agents alive.** Use Always On for critical roles, Interval for periodic checks.
-2. **Dormancy over termination.** If the agent will resume, pause it — don't kill it.
-3. **Respawn proactively.** Don't wait for full context exhaustion. First sign of degradation = time to respawn.
-4. **Update UUID references.** The most commonly missed step. One stale UUID = silent communication failure.
-5. **initialMessage is your superpower.** Get fresh agents productive in seconds by telling them exactly what to do first.
-6. **Identity files are your insurance.** Well-maintained SOUL.md and MEMORY.md make every restart painless.
+2. **Isolation mode replaces worktrees on v1.3+.** Opt-in via settings — each agent gets a full independent repo clone with standard git workflows.
+3. **Agent persistence is reliable on v1.3+.** Agents survive application restarts without the map ID mismatch workaround.
+4. **Dormancy over termination.** If the agent will resume, pause it — don't kill it.
+5. **Respawn proactively.** Don't wait for full context exhaustion. First sign of degradation = time to respawn.
+6. **Update UUID references.** The most commonly missed step. One stale UUID = silent communication failure.
+7. **initialMessage eliminates orientation time.** Get fresh agents productive in seconds by telling them exactly what to do first.
+8. **Identity files are your insurance.** Well-maintained SOUL.md and MEMORY.md make every restart painless.
 
 ---
 
-Next: [Chapter 4b — A2A Communication](04b-a2a-communication.md) — How agent-to-agent messaging works end-to-end.
+Next: [Chapter 5 — The Auditor Pattern](05-auditor-pattern.md) — Independent monitoring that catches what the hierarchy misses.
